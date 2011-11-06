@@ -166,4 +166,5 @@ Description: Video Acceleration (VA) API for Linux -- utilities
  limited to GPUs or Intel specific hardware, as other hardware and manufacturers
  can also freely use this API for hardware accelerated video decoding.
  .
- This package provides the avcenc, h264encode, mpeg2vldemo, and putsurface programs.
+ This package provides the avcenc, h264encode, mpeg2vldemo, and
+ putsurface programs.
