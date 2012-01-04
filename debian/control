@@ -12,7 +12,7 @@ Build-Depends:
  libxext-dev,
  libxfixes-dev,
  pkg-config
-Standards-Version: 3.9.1
+Standards-Version: 3.9.2
 Section: libs
 Homepage: http://www.freedesktop.org/wiki/Software/vaapi
 Vcs-Git: git://git.debian.org/git/pkg-multimedia/libva.git
