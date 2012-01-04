@@ -9,6 +9,7 @@ Uploaders:
 Build-Depends:
  debhelper (>= 7.0.50),
  dh-autoreconf,
+ libdrm-dev,
  libgl1-mesa-dev | libgl-dev,
  libx11-dev,
  libxext-dev,
