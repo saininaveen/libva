@@ -1,8 +1,28 @@
-libva (1.0.15-1) UNRELEASED; urgency=low
+libva (1.0.15-1) unstable; urgency=low
 
-  * New Upstream version
+  [ Reinhard Tartler ]
+  * Imported Upstream version 1.0.15 (Closes: #654567)
+  * Bump shlibs for API 'fixes' mentioned in upstream NEWS file
 
- -- Reinhard Tartler <siretart@tauware.de>  Fri, 04 Nov 2011 06:28:24 +0100
+  [ Brandon Snider ]
+  * The intel i965 driver has been moved to its own package
+    - Removed i965-va-driver package from debian/control and replaced it
+      with libva-egl1 package
+  * refreshed debian/patches/remove-unneeded-dep2.patch
+  * refreshed debian/patches/remove-unneeded-dep.patch
+  * Added depends on libva-egl1 to debian/control
+  * Added libva-utils package to debian/control
+  * Added egl.so file to debian/libva-dev.install
+  * Created debian/libva-utils.install
+
+  [ Matteo F. Vescovi ]
+  * debian/control: bump Standards-Version to 3.9.2
+  * debian/clean: clean upstream after build
+  * debian/control: "Section:" field re-positioned
+  * debian/control: adding myself to "Uploaders:" field
+  * debian/control: VCS-browser link updated
+
+ -- Reinhard Tartler <siretart@tauware.de>  Wed, 04 Jan 2012 20:42:33 +0100
 
 libva (1.0.14-1) unstable; urgency=low
 
