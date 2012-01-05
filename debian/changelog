@@ -1,4 +1,4 @@
-libva (1.0.15-1) unstable; urgency=low
+libva (1.0.15-1) experimental; urgency=low
 
   [ Reinhard Tartler ]
   * Imported Upstream version 1.0.15 (Closes: #654567)
