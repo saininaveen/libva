@@ -137,6 +137,7 @@ Description: Video Acceleration (VA) API for Linux -- EGL runtime
  This package provides the libva-egl library.
 
 Package: vainfo
+Section: video
 Architecture: any
 Depends:
  ${misc:Depends},
