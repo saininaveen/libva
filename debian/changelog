@@ -1,3 +1,9 @@
+libva (1.0.15-2) UNRELEASED; urgency=low
+
+  * debian/control: vainfo's "Section:" field defined (Closes: #631970)
+
+ -- Matteo F. Vescovi <mfv.debian@gmail.com>  Mon, 09 Jan 2012 08:53:00 +0100
+
 libva (1.0.15-1) experimental; urgency=low
 
   [ Reinhard Tartler ]
