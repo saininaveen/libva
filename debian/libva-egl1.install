@@ -1,1 +1,1 @@
-usr/lib/libva-egl.so.*
+usr/lib/*/libva-egl.so.*
