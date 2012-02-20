@@ -2,7 +2,9 @@
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-CONFIGURE_OPTIONS ?= --prefix=/usr --disable-silent-rules
+CONFIGURE_OPTIONS ?= --prefix=/usr \
+                     --disable-silent-rules \
+                     --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH)
 
 %:
 	dh $@ --with autoreconf
