@@ -26,16 +26,11 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends:
- libva-egl1 (<< ${source:Upstream-Version}+1~),
- libva-egl1 (>= ${source:Upstream-Version}),
- libva-glx1 (<< ${source:Upstream-Version}+1~),
- libva-glx1 (>= ${source:Upstream-Version}),
- libva-tpi1 (<< ${source:Upstream-Version}+1~),
- libva-tpi1 (>= ${source:Upstream-Version}),
- libva-x11-1 (<< ${source:Upstream-Version}+1~),
- libva-x11-1 (>= ${source:Upstream-Version}),
- libva1 (<< ${source:Upstream-Version}+1~),
- libva1 (>= ${source:Upstream-Version}),
+ libva-egl1 (= ${binary:Version}),
+ libva-glx1 (= ${binary:Version}),
+ libva-tpi1 (= ${binary:Version}),
+ libva-x11-1 (= ${binary:Version}),
+ libva1 (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends}
 Description: Video Acceleration (VA) API for Linux -- development files
