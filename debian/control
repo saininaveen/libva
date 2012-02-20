@@ -23,8 +23,8 @@ DM-Upload-Allowed: yes
 
 Package: libva-dev
 Section: libdevel
-Architecture: all
-Multi-Arch: foreign
+Architecture: any
+Multi-Arch: same
 Depends:
  libva-egl1 (<< ${source:Upstream-Version}+1~),
  libva-egl1 (>= ${source:Upstream-Version}),
