@@ -3,6 +3,7 @@ libva (1.0.15-2) UNRELEASED; urgency=low
   * debian/control: vainfo's "Section:" field defined (Closes: #631970)
   * debian/control: libva-dev's arch from "all" to "any"
   * debian/control: libva-dev dependencies cleaned
+  * debian/control: Standards-Version bumped to 3.9.3
   * debian/rules: configure parameters added for M-A
   * debian/: Multi-Arch support added
 
