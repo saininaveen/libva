@@ -24,6 +24,7 @@ DM-Upload-Allowed: yes
 Package: libva-dev
 Section: libdevel
 Architecture: any
+Multi-Arch: same
 Depends:
  libva-egl1 (= ${binary:Version}),
  libva-glx1 (= ${binary:Version}),
