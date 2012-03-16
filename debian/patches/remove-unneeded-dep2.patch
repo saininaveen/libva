@@ -6,7 +6,7 @@ Last-Update: 2011-02-13
 
 --- a/va/Makefile.am
 +++ b/va/Makefile.am
-@@ -71,8 +71,8 @@ SUBDIRS				+= x11
+@@ -71,8 +71,8 @@
  lib_LTLIBRARIES			+= libva-x11.la
  libva_x11_la_SOURCES		= 
  libva_x11_la_LDFLAGS		= $(LDADD)
@@ -19,7 +19,7 @@ Last-Update: 2011-02-13
  if USE_GLX
 --- a/test/basic/Makefile.am
 +++ b/test/basic/Makefile.am
-@@ -25,7 +25,8 @@ check_PROGRAMS = test_01 test_02 test_03
+@@ -25,7 +25,8 @@
  
  AM_CFLAGS = -I$(top_srcdir)/va -I$(top_srcdir)/src/x11
  

@@ -28,7 +28,7 @@ Bug-Debian: http://bugs.debian.org/612480
  
  struct VADriverVTableTPI
  {
-@@ -43,6 +45,8 @@ struct VADriverVTableTPI
+@@ -43,6 +45,8 @@
  		VASurfaceID *surface		/* out */
  	);
      
@@ -37,7 +37,7 @@ Bug-Debian: http://bugs.debian.org/612480
          VAStatus (*vaCreateSurfaceFromV4L2Buf) (
  		VADriverContextP ctx,
                  int v4l2_fd,         /* file descriptor of V4L2 device */
-@@ -51,6 +55,8 @@ struct VADriverVTableTPI
+@@ -51,6 +55,8 @@
                  VASurfaceID *surface	           /* out */
          );
  
@@ -48,7 +48,7 @@ Bug-Debian: http://bugs.debian.org/612480
                  int width,
 --- a/va/va_tpi.c
 +++ b/va/va_tpi.c
-@@ -66,6 +66,8 @@ VAStatus vaCreateSurfaceFromCIFrame (
+@@ -66,6 +66,8 @@
    
  }
  
@@ -57,7 +57,7 @@ Bug-Debian: http://bugs.debian.org/612480
  /* Wrap a V4L2 buffer as a VA surface, so that V4L2 camera, VA encode
   * can share the data without copy
   * The VA driver should query the camera device from v4l2_fd to see
-@@ -98,6 +100,7 @@ VAStatus vaCreateSurfaceFromV4L2Buf(
+@@ -98,6 +100,7 @@
        return VA_STATUS_ERROR_UNIMPLEMENTED;
  }
  
