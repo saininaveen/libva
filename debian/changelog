@@ -13,10 +13,11 @@ libva (1.0.15-2) unstable; urgency=low
   * Don't include Multi-Arch field for packages which are not shared libraries.
   * Use dh_auto_configure to pass in default+extra configure options.
   * Support parallel builds.
-  * Remove test/demo programs from installation. This removes the libva-utils package.
+  * Remove test/demo programs from installation. This removes the libva-utils
+    package.
   * Refreshed patches.
 
- -- Andres Mejia <amejia@debian.org>  Fri, 16 Mar 2012 10:59:52 -0400
+ -- Andres Mejia <amejia@debian.org>  Fri, 16 Mar 2012 11:10:01 -0400
 
 libva (1.0.15-1) experimental; urgency=low
 
