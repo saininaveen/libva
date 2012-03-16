@@ -24,7 +24,6 @@ DM-Upload-Allowed: yes
 Package: libva-dev
 Section: libdevel
 Architecture: any
-Multi-Arch: same
 Depends:
  libva-egl1 (= ${binary:Version}),
  libva-glx1 (= ${binary:Version}),
@@ -145,7 +144,6 @@ Description: Video Acceleration (VA) API for Linux -- EGL runtime
 Package: vainfo
 Section: video
 Architecture: any
-Multi-Arch: same
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
@@ -163,7 +161,6 @@ Description: Video Acceleration (VA) API for Linux -- info program
 
 Package: libva-utils
 Architecture: any
-Multi-Arch: same
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
