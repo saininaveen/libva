@@ -1,3 +1,9 @@
+libva (1.0.15-4) unstable; urgency=low
+
+  * Change section of vainfo to utils.
+
+ -- Andres Mejia <amejia@debian.org>  Sun, 18 Mar 2012 14:08:35 -0400
+
 libva (1.0.15-3) unstable; urgency=low
 
   * Allow dev package to be multi-arch installable.
