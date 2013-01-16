@@ -1,8 +1,13 @@
-libva (1.0.15-5) UNRELEASED; urgency=low
+libva (1.1.0-1) UNRELEASED; urgency=low
 
+  [ Andres Mejia ]
   * Prepare new upload.
+  * Rewrite README.Debian with relavant info about the package names for drivers.
 
- -- Andres Mejia <amejia@debian.org>  Tue, 20 Mar 2012 20:52:40 -0400
+  [ Matteo F. Vescovi ]
+  * Imported Upstream version 1.1.0
+
+ -- Andres Mejia <amejia004@gmail.com>  Wed, 16 Jan 2013 11:50:37 +0100
 
 libva (1.0.15-4) unstable; urgency=low
 
