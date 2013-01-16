@@ -20,9 +20,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+SUBDIRS = common decode encode vainfo
 
-AM_CFLAGS = -I$(top_srcdir)/va -I$(top_srcdir)/test/basic -I$(top_srcdir)/src/x11
-
-SUBDIRS = basic decode encode putsurface vainfo
+if USE_X11
+SUBDIRS += basic putsurface v4l_h264
+endif
 
 EXTRA_DIST = loadsurface.h loadsurface_yuv.h

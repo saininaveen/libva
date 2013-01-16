@@ -1,16 +1,38 @@
 /*
+ * Copyright (c) 2012 Intel Corporation. All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the
+ * next paragraph) shall be included in all copies or substantial portions
+ * of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+ * IN NO EVENT SHALL PRECISION INSIGHT AND/OR ITS SUPPLIERS BE LIABLE FOR
+ * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+/*
  * Simple AVC encoder based on libVA.
  *
  * Usage:
  * ./avcenc <width> <height> <input file> <output file> [qp]
  */  
 
+#include "sysdeps.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <X11/Xlib.h>
-
 #include <unistd.h>
 
 #include <sys/types.h>
@@ -20,7 +42,7 @@
 #include <time.h>
 
 #include <va/va.h>
-#include <va/va_x11.h>
+#include "va_display.h"
 
 #define NAL_REF_IDC_NONE        0
 #define NAL_REF_IDC_LOW         1
@@ -49,7 +71,6 @@
         exit(1);                                                        \
     }
 
-static Display *x11_display;
 static VADisplay va_dpy;
 static VAContextID context_id;
 static VAConfigID config_id;
@@ -77,10 +98,7 @@ static void create_encode_pipe()
     int major_ver, minor_ver;
     VAStatus va_status;
 
-    x11_display = XOpenDisplay(":0.0");
-    assert(x11_display);
-
-    va_dpy = vaGetDisplay(x11_display);
+    va_dpy = va_open_display();
     va_status = vaInitialize(va_dpy, &major_ver, &minor_ver);
     CHECK_VASTATUS(va_status, "vaInitialize");
 
@@ -135,7 +153,7 @@ static void destory_encode_pipe()
     vaDestroyContext(va_dpy,context_id);
     vaDestroyConfig(va_dpy,config_id);
     vaTerminate(va_dpy);
-    XCloseDisplay(x11_display);
+    va_close_display(va_dpy);
 }
 
 /***************************************************
@@ -368,7 +386,7 @@ get_coded_bitsteam_length(unsigned char *buffer, int buffer_length)
 }
 
 static unsigned int 
-swap32(unsigned int val)
+va_swap32(unsigned int val)
 {
     unsigned char *pval = (unsigned char *)&val;
 
@@ -396,7 +414,7 @@ bitstream_end(bitstream *bs, FILE *avc_fp)
     size_t w_items;
 
     if (bit_offset) {
-        bs->buffer[pos] = swap32((bs->buffer[pos] << bit_left));
+        bs->buffer[pos] = va_swap32((bs->buffer[pos] << bit_left));
     }
 
     do {
@@ -423,7 +441,7 @@ bitstream_put_ui(bitstream *bs, unsigned int val, int size_in_bits)
     } else {
         size_in_bits -= bit_left;
         bs->buffer[pos] = (bs->buffer[pos] << bit_left) | (val >> size_in_bits);
-        bs->buffer[pos] = swap32(bs->buffer[pos]);
+        bs->buffer[pos] = va_swap32(bs->buffer[pos]);
 
         if (pos + 1 == bs->max_size_in_dword) {
             bs->max_size_in_dword += BITSTREAM_ALLOCATE_STEPPING;
@@ -749,6 +767,8 @@ int main(int argc, char *argv[])
     long file_size;
     clock_t start_clock, end_clock;
     float encoding_time;
+
+    va_init_display_args(&argc, argv);
 
     if(argc != 5 && argc != 6) {
         printf("Usage: %s <width> <height> <input_yuvfile> <output_avcfile> [qp]\n", argv[0]);

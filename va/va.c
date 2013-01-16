@@ -47,7 +47,6 @@
 #define CHECK_MAXIMUM(s, ctx, var) if (!va_checkMaximum(ctx->max_##var, #var)) s = VA_STATUS_ERROR_UNKNOWN;
 #define CHECK_STRING(s, ctx, var) if (!va_checkString(ctx->str_##var, #var)) s = VA_STATUS_ERROR_UNKNOWN;
 
-
 /*
  * read a config "env" for libva.conf or from environment setting
  * liva.conf has higher priority
@@ -104,49 +103,79 @@ int vaDisplayIsValid(VADisplay dpy)
 
 void va_errorMessage(const char *msg, ...)
 {
+    char buf[512], *dynbuf;
     va_list args;
+    int n, len;
 
-    fprintf(stderr, "libva error: ");
     va_start(args, msg);
-    vfprintf(stderr, msg, args);
+    len = vsnprintf(buf, sizeof(buf), msg, args);
     va_end(args);
+
+    if (len >= (int)sizeof(buf)) {
+        dynbuf = malloc(len + 1);
+        if (!dynbuf)
+            return;
+        va_start(args, msg);
+        n = vsnprintf(dynbuf, len + 1, msg, args);
+        va_end(args);
+        if (n == len)
+            va_log_error(dynbuf);
+        free(dynbuf);
+    }
+    else if (len > 0)
+        va_log_error(buf);
 }
 
 void va_infoMessage(const char *msg, ...)
 {
+    char buf[512], *dynbuf;
     va_list args;
+    int n, len;
 
-    fprintf(stderr, "libva: ");
     va_start(args, msg);
-    vfprintf(stderr, msg, args);
+    len = vsnprintf(buf, sizeof(buf), msg, args);
     va_end(args);
+
+    if (len >= (int)sizeof(buf)) {
+        dynbuf = malloc(len + 1);
+        if (!dynbuf)
+            return;
+        va_start(args, msg);
+        n = vsnprintf(dynbuf, len + 1, msg, args);
+        va_end(args);
+        if (n == len)
+            va_log_info(dynbuf);
+        free(dynbuf);
+    }
+    else if (len > 0)
+        va_log_info(buf);
 }
 
-static Bool va_checkVtable(void *ptr, char *function)
+static bool va_checkVtable(void *ptr, char *function)
 {
     if (!ptr) {
         va_errorMessage("No valid vtable entry for va%s\n", function);
-        return False;
+        return false;
     }
-    return True;
+    return true;
 }
 
-static Bool va_checkMaximum(int value, char *variable)
+static bool va_checkMaximum(int value, char *variable)
 {
     if (!value) {
         va_errorMessage("Failed to define max_%s in init\n", variable);
-        return False;
+        return false;
     }
-    return True;
+    return true;
 }
 
-static Bool va_checkString(const char* value, char *variable)
+static bool va_checkString(const char* value, char *variable)
 {
     if (!value) {
         va_errorMessage("Failed to define str_%s in init\n", variable);
-        return False;
+        return false;
     }
-    return True;
+    return true;
 }
 
 static inline int
@@ -202,10 +231,30 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
         } else {
             VADriverInit init_func = NULL;
             char init_func_s[256];
-            if (va_getDriverInitName(init_func_s, sizeof(init_func_s),
-                                     VA_MAJOR_VERSION, VA_MINOR_VERSION))
-                init_func = (VADriverInit) dlsym(handle, init_func_s);
-            if (!init_func) {
+            int i;
+
+            static const struct {
+                int major;
+                int minor;
+            } compatible_versions[] = {
+                { VA_MAJOR_VERSION, VA_MINOR_VERSION },
+                { 0, 32 },
+                { -1, }
+            };
+
+            for (i = 0; compatible_versions[i].major >= 0; i++) {
+                if (va_getDriverInitName(init_func_s, sizeof(init_func_s),
+                                         compatible_versions[i].major,
+                                         compatible_versions[i].minor)) {
+                    init_func = (VADriverInit)dlsym(handle, init_func_s);
+                    if (init_func) {
+                        va_infoMessage("Found init function %s\n", init_func_s);
+                        break;
+                    }
+                }
+            }
+
+            if (compatible_versions[i].major < 0) {
                 va_errorMessage("%s has no function %s\n",
                                 driver_path, init_func_s);
                 dlclose(handle);

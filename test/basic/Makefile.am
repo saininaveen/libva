@@ -20,12 +20,31 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-noinst_PROGRAMS = test_01 test_02 test_03 test_04 test_05 test_06 \
-		test_07 test_08 test_09 test_10 test_11
+noinst_PROGRAMS = \
+	test_01			\
+	test_02			\
+	test_03			\
+	test_04			\
+	test_05			\
+	test_06			\
+	test_07			\
+	test_08			\
+	test_09			\
+	test_10			\
+	test_11			\
+	$(NULL)
 
-AM_CFLAGS = -I$(top_srcdir)/va -I$(top_srcdir)/src/x11
+AM_CFLAGS = \
+	-DIN_LIBVA		\
+	-I$(top_srcdir)		\
+	$(X11_CFLAGS)		\
+	$(NULL)
 
-TEST_LIBS = $(top_builddir)/va/$(libvabackendlib) $(top_builddir)/va/$(libvacorelib) -lpthread -lX11
+TEST_LIBS = \
+	$(top_builddir)/va/libva.la	\
+	$(top_builddir)/va/libva-x11.la	\
+	$(X11_LIBS)			\
+	$(NULL)
 
 test_01_LDADD = $(TEST_LIBS)
 test_01_SOURCES = test_01.c
