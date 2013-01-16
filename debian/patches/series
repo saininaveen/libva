@@ -1,3 +1,2 @@
-remove-unneeded-dep.patch
-remove-unneeded-dep2.patch
-kfreebsd-fixes.patch
+0001-FTBFS_on_GNU-kFreeBSD.patch
+0002-Remove_unneeded_dependencies.patch

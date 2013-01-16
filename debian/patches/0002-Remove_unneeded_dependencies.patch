@@ -1,0 +1,23 @@
+From: Andres Mejia <mcitadel@gmail.com>
+Date: Wed, 16 Jan 2013 14:45:31 +0100
+Subject: Remove_unneeded_dependencies
+
+Patch to remove unnecessary dependency
+to libva-x11 for dummy driver.
+---
+ dummy_drv_video/Makefile.am | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/dummy_drv_video/Makefile.am b/dummy_drv_video/Makefile.am
+index 69364c2..50f8ee9 100644
+--- a/dummy_drv_video/Makefile.am
++++ b/dummy_drv_video/Makefile.am
+@@ -26,8 +26,6 @@ if BUILD_DUMMY_DRIVER
+ dummy_drv_video_la_LTLIBRARIES	= dummy_drv_video.la
+ dummy_drv_video_ladir		= $(LIBVA_DRIVERS_PATH)
+ dummy_drv_video_la_LDFLAGS	= -module -avoid-version -no-undefined -Wl,--no-undefined
+-dummy_drv_video_la_LIBADD	= $(top_builddir)/va/libva-x11.la
+-dummy_drv_video_la_DEPENDENCIES	= $(top_builddir)/va/libva-x11.la
+ dummy_drv_video_la_SOURCES	= dummy_drv_video.c object_heap.c
+ noinst_HEADERS			= dummy_drv_video.h object_heap.h
+ endif
