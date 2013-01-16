@@ -1,11 +1,19 @@
 libva (1.1.0-1) UNRELEASED; urgency=low
 
   [ Andres Mejia ]
-  * Prepare new upload.
-  * Rewrite README.Debian with relavant info about the package names for drivers.
+  * Rewrite README.Debian with relavant info
+    about the package names for drivers.
 
   [ Matteo F. Vescovi ]
   * Imported Upstream version 1.1.0
+  * debian/control: libegl1-mesa-dev b-dep added
+  * debian/control: obsolete DMUA flag dropped
+  * debian/control: S-V 3.9.3 => 3.9.4 (no changes needed)
+  * debian/watch: uscan path updated.
+    Thanks to Bart Martens (bartm) for the hint.
+
+  [ Reinhard Tartler ]
+  * bump shlibs
 
  -- Andres Mejia <amejia004@gmail.com>  Wed, 16 Jan 2013 11:50:37 +0100
 
