@@ -10,6 +10,7 @@ Build-Depends:
  debhelper (>= 9),
  dh-autoreconf,
  libdrm-dev,
+ libegl1-mesa-dev,
  libgl1-mesa-dev | libgl-dev,
  libx11-dev,
  libxext-dev,
