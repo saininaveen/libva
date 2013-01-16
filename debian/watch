@@ -1,3 +1,2 @@
 version=3
-# we look for urls like http://cgit.freedesktop.org/libva/snapshot/libva-1.0.5.tar.bz2
-http://cgit.freedesktop.org/libva/ /libva/snapshot/libva-([\d+\.]+)\.tar\.bz2
+http://www.freedesktop.org/software/vaapi/releases/libva/libva-(\d.*)\.(?:tgz|tbz2|tar\.(?:gz|bz2|xz))
