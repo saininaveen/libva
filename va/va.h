@@ -511,6 +511,8 @@ typedef enum
     VAImageBufferType			= 9,
     VAProtectedSliceDataBufferType	= 10,
     VAQMatrixBufferType                 = 11,
+    VAHuffmanTableBufferType            = 12,
+
 /* Following are encode buffer types */
     VAEncCodedBufferType		= 21,
     VAEncSequenceParameterBufferType	= 22,
@@ -629,6 +631,7 @@ typedef struct _VAEncPictureParameterBufferJPEG
     VABufferID coded_buf;
 } VAEncPictureParameterBufferJPEG;
 
+#include <va/va_dec_jpeg.h>
 
 /****************************
  * MPEG-2 data structures
@@ -1124,9 +1127,20 @@ typedef struct _VAIQMatrixBufferH264
 typedef struct _VASliceParameterBufferH264
 {
     unsigned int slice_data_size;/* number of bytes in the slice data buffer for this slice */
-    unsigned int slice_data_offset;/* the offset to the NAL start code for this slice */
+    /** \brief Byte offset to the NAL Header Unit for this slice. */
+    unsigned int slice_data_offset;
     unsigned int slice_data_flag; /* see VA_SLICE_DATA_FLAG_XXX defintions */
-    unsigned short slice_data_bit_offset; /* bit offset from NAL start code to the beginning of slice data */
+    /**
+     * \brief Bit offset from NAL Header Unit to the begining of slice_data().
+     *
+     * This bit offset is relative to and includes the NAL unit byte
+     * and represents the number of bits parsed in the slice_header()
+     * after the removal of any emulation prevention bytes in
+     * there. However, the slice data buffer passed to the hardware is
+     * the original bitstream, thus including any emulation prevention
+     * bytes.
+     */
+    unsigned short slice_data_bit_offset;
     unsigned short first_mb_in_slice;
     unsigned char slice_type;
     unsigned char direct_spatial_mv_pred_flag;
