@@ -22,15 +22,21 @@
 
 bin_PROGRAMS = mpeg2vldemo loadjpeg
 
-INCLUDES = -I$(top_srcdir)
+INCLUDES = \
+	-I$(top_srcdir)				\
+	-I$(top_srcdir)/test/common		\
+	$(NULL)
 
-TEST_LIBS = $(top_builddir)/va/$(libvabackendlib) $(top_builddir)/va/$(libvacorelib) -lX11
+TEST_LIBS = \
+	$(top_builddir)/va/libva.la		\
+	$(top_builddir)/test/common/libva-display.la	\
+	$(NULL)
 
-mpeg2vldemo_LDADD = $(TEST_LIBS)
-mpeg2vldemo_SOURCES = mpeg2vldemo.cpp
+mpeg2vldemo_LDADD	= $(TEST_LIBS)
+mpeg2vldemo_SOURCES	= mpeg2vldemo.cpp
 
-loadjpeg_LDADD = $(TEST_LIBS)
-loadjpeg_SOURCES = loadjpeg.c tinyjpeg.c
+loadjpeg_LDADD		= $(TEST_LIBS)
+loadjpeg_SOURCES	= loadjpeg.c tinyjpeg.c
 
 valgrind:	$(bin_PROGRAMS)
 	for a in $(bin_PROGRAMS); do \

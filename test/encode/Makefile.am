@@ -20,17 +20,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-bin_PROGRAMS = h264encode avcenc
+bin_PROGRAMS = avcenc
+if USE_X11
+bin_PROGRAMS += h264encode
+endif
 
-INCLUDES = -I$(top_srcdir)
+INCLUDES = \
+	-I$(top_srcdir)			\
+	-I$(top_srcdir)/va		\
+	$(NULL)
 
-TEST_LIBS = $(top_builddir)/va/$(libvabackendlib) $(top_builddir)/va/$(libvacorelib) -lpthread -lX11
+h264encode_SOURCES	= h264encode_x11.c
+h264encode_CFLAGS	= $(X11_CFLAGS)
+h264encode_LDADD	= \
+	$(top_builddir)/va/libva.la \
+	$(top_builddir)/va/libva-x11.la \
+	$(X11_LIBS)
 
-h264encode_LDADD = $(TEST_LIBS)
-h264encode_SOURCES = h264encode_x11.c
-
-avcenc_LDADD= $(TEST_LIBS)
-avcenc_SOURCES= avcenc.c
+avcenc_SOURCES		= avcenc.c
+avcenc_CFLAGS		= -I$(top_srcdir)/test/common
+avcenc_LDADD		= \
+	$(top_builddir)/va/libva.la \
+	$(top_builddir)/test/common/libva-display.la
 
 EXTRA_DIST = h264encode_common.c
 

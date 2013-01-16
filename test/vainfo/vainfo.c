@@ -22,18 +22,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef ANDROID
-#include <va/va_x11.h>
-#else
-#include "va/va_android.h"
-#define Display unsigned int
-#endif
-
+#include "sysdeps.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include "va_display.h"
+#include "va/sysdeps.h"
 
 #define CHECK_VASTATUS(va_status,func, ret)                             \
 if (va_status != VA_STATUS_SUCCESS) {                                   \
@@ -79,12 +74,10 @@ static char * entrypoint_string(VAEntrypoint entrypoint)
 
 int main(int argc, const char* argv[])
 {
-  Display *dpy;
   VADisplay va_dpy;
   VAStatus va_status;
   int major_version, minor_version;
   const char *driver;
-  const char *display = getenv("DISPLAY");
   const char *name = strrchr(argv[0], '/'); 
   VAProfile profile;
   VAEntrypoint entrypoint, entrypoints[10];
@@ -95,18 +88,7 @@ int main(int argc, const char* argv[])
   else
       name = argv[0];
 
-#ifndef ANDROID
-  dpy = XOpenDisplay(NULL);
-#else
-  dpy = (Display*)malloc(sizeof(Display));
-#endif
-  if (NULL == dpy)
-  {
-      fprintf(stderr, "%s: Error, can't open display: '%s'\n", name, display ? display : "");
-      return 1;
-  }
-  
-  va_dpy = vaGetDisplay(dpy);
+  va_dpy = va_open_display();
   if (NULL == va_dpy)
   {
       fprintf(stderr, "%s: vaGetDisplay() failed\n", name);
@@ -123,7 +105,7 @@ int main(int argc, const char* argv[])
   printf("%s: Driver version: %s\n", name, driver ? driver : "<unknown>");
 
   printf("%s: Supported profile and entrypoints\n", name);
-  for	(profile = VAProfileMPEG2Simple; profile <= VAProfileH263Baseline; profile++) {
+  for	(profile = VAProfileMPEG2Simple; profile <= VAProfileH264ConstrainedBaseline; profile++) {
       char *profile_str;
 
       va_status = vaQueryConfigEntrypoints(va_dpy, profile, entrypoints, 
@@ -139,6 +121,7 @@ int main(int argc, const char* argv[])
   }
   
   vaTerminate(va_dpy);
+  va_close_display(va_dpy);
   
   return 0;
 }

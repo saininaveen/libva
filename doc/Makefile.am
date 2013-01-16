@@ -1,4 +1,4 @@
-# Copyright (c) 2007 Intel Corporation. All Rights Reserved.
+# Copyright (c) 2007-2011 Intel Corporation. All Rights Reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the
@@ -7,11 +7,11 @@
 # distribute, sub license, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice (including the
 # next paragraph) shall be included in all copies or substantial portions
 # of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 # OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
@@ -20,13 +20,33 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-AM_CFLAGS = -DLINUX -I$(top_srcdir)/va -I$(top_srcdir)/va/x11 $(DRM_CFLAGS)
+all: html
+install-data-local: install-html
 
-noinst_LTLIBRARIES = libva_dummy.la	
+EXTRA_DIST = \
+	Doxyfile			\
+	$(NULL)
 
-libva_dummy_la_LIBADD = $(LIBVA_LIBS) -ldl -ludev
+VA_HEADER_DIR   = $(top_srcdir)/va
+VA_HEADER_FILES = \
+	$(NULL)
 
-libva_dummyincludedir = ${includedir}/va
+export VA_HEADER_DIR
+export VA_HEADER_FILES
+html-out/index.html: Doxyfile $(VA_HEADER_FILES)
+	$(DOXYGEN) $<
 
-libva_dummy_la_SOURCES = va_dummy.c drmtest.c
+if ENABLE_DOCS
+html: html-out/index.html
+install-html-local:
+	install -d $(DESTDIR)$(docdir)/html
+	install -m 0644 html-out/* $(DESTDIR)$(docdir)/html
+uninstall-local:
+	rm -rf $(DESTDIR)$(docdir)/html
+endif
 
+clean-local:
+	rm -rf html-out
+
+# Extra clean files so that maintainer-clean removes *everything*
+MAINTAINERCLEANFILES = Makefile.in

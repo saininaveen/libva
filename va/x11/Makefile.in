@@ -61,7 +61,10 @@ subdir = va/x11
 DIST_COMMON = $(libva_x11include_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -70,8 +73,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libva_x11_la_LIBADD =
-am__objects_1 = dri1_util.lo dri2_util.lo va_dri.lo va_dri2.lo \
-	va_dricommon.lo va_fglrx.lo va_nvctrl.lo va_x11.lo
+am__objects_1 = dri2_util.lo va_dri2.lo va_dricommon.lo va_fglrx.lo \
+	va_nvctrl.lo va_x11.lo
 am_libva_x11_la_OBJECTS = $(am__objects_1)
 libva_x11_la_OBJECTS = $(am_libva_x11_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -158,6 +161,7 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
+DOXYGEN = @DOXYGEN@
 DRM_CFLAGS = @DRM_CFLAGS@
 DRM_LIBS = @DRM_LIBS@
 DSYMUTIL = @DSYMUTIL@
@@ -165,11 +169,13 @@ DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EGL_CFLAGS = @EGL_CFLAGS@
+EGL_LIBS = @EGL_LIBS@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-GL_DEPS_CFLAGS = @GL_DEPS_CFLAGS@
-GL_DEPS_LIBS = @GL_DEPS_LIBS@
+GLX_CFLAGS = @GLX_CFLAGS@
+GLX_LIBS = @GLX_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -182,9 +188,7 @@ LIBDRM_VERSION = @LIBDRM_VERSION@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBVA_CFLAGS = @LIBVA_CFLAGS@
 LIBVA_DRIVERS_PATH = @LIBVA_DRIVERS_PATH@
-LIBVA_LIBS = @LIBVA_LIBS@
 LIBVA_LT_LDFLAGS = @LIBVA_LT_LDFLAGS@
 LIBVA_LT_VERSION = @LIBVA_LT_VERSION@
 LIBVA_MAJOR_VERSION = @LIBVA_MAJOR_VERSION@
@@ -219,13 +223,15 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-UDEV_CFLAGS = @UDEV_CFLAGS@
-UDEV_LIBS = @UDEV_LIBS@
+TODAY = @TODAY@
 VA_API_MAJOR_VERSION = @VA_API_MAJOR_VERSION@
 VA_API_MICRO_VERSION = @VA_API_MICRO_VERSION@
 VA_API_MINOR_VERSION = @VA_API_MINOR_VERSION@
 VA_API_VERSION = @VA_API_VERSION@
 VERSION = @VERSION@
+WAYLAND_API_VERSION = @WAYLAND_API_VERSION@
+WAYLAND_CFLAGS = @WAYLAND_CFLAGS@
+WAYLAND_LIBS = @WAYLAND_LIBS@
 X11_CFLAGS = @X11_CFLAGS@
 X11_LIBS = @X11_LIBS@
 XEXT_CFLAGS = @XEXT_CFLAGS@
@@ -268,8 +274,6 @@ infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
 libexecdir = @libexecdir@
-libvabackendlib = @libvabackendlib@
-libvacorelib = @libvacorelib@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
@@ -288,11 +292,20 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-INCLUDES = -DLINUX -I$(top_srcdir) -I$(top_srcdir)/va $(DRM_CFLAGS)
+wayland_protocoldir = @wayland_protocoldir@
+wayland_scanner = @wayland_scanner@
+INCLUDES = \
+	-DLINUX			\
+	-I$(top_srcdir)		\
+	-I$(top_srcdir)/va	\
+	$(X11_CFLAGS)		\
+	$(XEXT_CFLAGS)		\
+	$(XFIXES_CFLAGS)	\
+	$(DRM_CFLAGS)		\
+	$(NULL)
+
 source_c = \
-	dri1_util.c		\
 	dri2_util.c		\
-	va_dri.c		\
 	va_dri2.c		\
 	va_dricommon.c		\
 	va_fglrx.c		\
@@ -301,7 +314,6 @@ source_c = \
 	$(NULL)
 
 source_h = \
-	va_dri.h		\
 	va_dri2.h		\
 	va_dricommon.h		\
 	$(NULL)
@@ -309,7 +321,6 @@ source_h = \
 source_h_priv = \
 	va_dri2str.h		\
 	va_dri2tokens.h		\
-	va_dristr.h		\
 	va_fglrx.h		\
 	va_nvctrl.h		\
 	$(NULL)
@@ -371,9 +382,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dri1_util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dri2_util.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_dri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_dri2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_dricommon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_fglrx.Plo@am__quote@

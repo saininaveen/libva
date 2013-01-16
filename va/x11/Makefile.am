@@ -20,12 +20,18 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-INCLUDES = -DLINUX -I$(top_srcdir) -I$(top_srcdir)/va $(DRM_CFLAGS)
+INCLUDES = \
+	-DLINUX			\
+	-I$(top_srcdir)		\
+	-I$(top_srcdir)/va	\
+	$(X11_CFLAGS)		\
+	$(XEXT_CFLAGS)		\
+	$(XFIXES_CFLAGS)	\
+	$(DRM_CFLAGS)		\
+	$(NULL)
 
 source_c = \
-	dri1_util.c		\
 	dri2_util.c		\
-	va_dri.c		\
 	va_dri2.c		\
 	va_dricommon.c		\
 	va_fglrx.c		\
@@ -34,7 +40,6 @@ source_c = \
 	$(NULL)
 
 source_h = \
-	va_dri.h		\
 	va_dri2.h		\
 	va_dricommon.h		\
 	$(NULL)
@@ -42,7 +47,6 @@ source_h = \
 source_h_priv = \
 	va_dri2str.h		\
 	va_dri2tokens.h		\
-	va_dristr.h		\
 	va_fglrx.h		\
 	va_nvctrl.h		\
 	$(NULL)
