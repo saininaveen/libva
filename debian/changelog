@@ -1,4 +1,4 @@
-libva (1.1.0-1) UNRELEASED; urgency=low
+libva (1.1.0-1) experimental; urgency=low
 
   [ Andres Mejia ]
   * Rewrite README.Debian with relavant info
@@ -15,9 +15,9 @@ libva (1.1.0-1) UNRELEASED; urgency=low
     Thanks to Bart Martens (bartm) for the hint.
 
   [ Reinhard Tartler ]
-  * bump shlibs
+  * Bump shlibs
 
- -- Andres Mejia <amejia004@gmail.com>  Wed, 16 Jan 2013 11:50:37 +0100
+ -- Reinhard Tartler <siretart@tauware.de>  Thu, 17 Jan 2013 08:04:12 +0100
 
 libva (1.0.15-4) unstable; urgency=low
 
