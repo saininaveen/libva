@@ -42,7 +42,7 @@ m4_define([va_api_version],
 # - reset micro version to zero when VA-API major or minor version is changed
 m4_define([libva_major_version], [m4_eval(va_api_major_version + 1)])
 m4_define([libva_minor_version], [m4_eval(va_api_minor_version - 32)])
-m4_define([libva_micro_version], [0])
+m4_define([libva_micro_version], [1])
 m4_define([libva_pre_version],   [0])
 
 m4_define([libva_version],
@@ -78,7 +78,7 @@ m4_define([libva_lt_age],
 m4_define([libdrm_version], [2.4])
 
 # Wayland minimum version number
-m4_define([wayland_api_version], [0.95.0])
+m4_define([wayland_api_version], [1.0.0])
 
 AC_PREREQ(2.57)
 AC_INIT([libva], [libva_version], [waldo.bastian@intel.com], libva)
@@ -86,7 +86,7 @@ AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([dist-bzip2])
 
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 TODAY="`LC_ALL=C date +'%a, %d %b %Y %X %z'`"
