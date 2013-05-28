@@ -26,6 +26,7 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends:
+ libva-drm1 (= ${binary:Version}),
  libva-egl1 (= ${binary:Version}),
  libva-glx1 (= ${binary:Version}),
  libva-tpi1 (= ${binary:Version}),
