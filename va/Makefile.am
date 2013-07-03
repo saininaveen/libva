@@ -31,6 +31,7 @@ LDADD = \
 
 libva_source_c = \
 	va.c			\
+	va_compat.c		\
 	va_fool.c		\
 	va_trace.c		\
 	$(NULL)
@@ -39,10 +40,15 @@ libva_source_h = \
 	va.h			\
 	va_backend.h		\
 	va_backend_tpi.h	\
+	va_backend_vpp.h	\
+	va_compat.h		\
 	va_dec_jpeg.h		\
 	va_drmcommon.h		\
+	va_enc_h264.h		\
+	va_enc_mpeg2.h		\
 	va_tpi.h		\
 	va_version.h		\
+	va_vpp.h		\
 	$(NULL)
 
 libva_source_h_priv = \
@@ -51,12 +57,18 @@ libva_source_h_priv = \
 	va_trace.h		\
 	$(NULL)
 
+libva_ldflags = \
+	$(LDADD) -no-undefined	\
+	-Wl,-version-script,libva.syms \
+	$(NULL)
+
 lib_LTLIBRARIES			= libva.la
 libvaincludedir			= ${includedir}/va
 libvainclude_HEADERS		= $(libva_source_h)
 noinst_HEADERS			= $(libva_source_h_priv)
 libva_la_SOURCES		= $(libva_source_c)
-libva_la_LDFLAGS		= $(LDADD) -no-undefined
+libva_la_LDFLAGS		= $(libva_ldflags)
+libva_la_DEPENDENCIES		= libva.syms
 libva_la_LIBADD			= $(LIBVA_LIBS) -ldl
 
 lib_LTLIBRARIES			+= libva-tpi.la
@@ -101,8 +113,8 @@ SUBDIRS				+= egl
 lib_LTLIBRARIES			+= libva-egl.la
 libva_egl_la_SOURCES		=
 libva_egl_la_LDFLAGS		= $(LDADD)
-libva_egl_la_DEPENDENCIES	= libva.la egl/libva_egl.la libva-x11.la
-libva_egl_la_LIBADD		= libva.la egl/libva_egl.la libva-x11.la \
+libva_egl_la_DEPENDENCIES	= libva.la egl/libva_egl.la 
+libva_egl_la_LIBADD		= libva.la egl/libva_egl.la \
 	$(EGL_LIBS) -ldl
 endif
 

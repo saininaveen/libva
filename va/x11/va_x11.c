@@ -136,7 +136,9 @@ static VAStatus va_DisplayContextGetDriverName (
 
     if (driver_name)
 	*driver_name = NULL;
-
+    else
+        return VA_STATUS_ERROR_UNKNOWN;
+    
     vaStatus = va_DRI2GetDriverName(pDisplayContext, driver_name);
     if (vaStatus != VA_STATUS_SUCCESS)
         vaStatus = va_NVCTRL_GetDriverName(pDisplayContext, driver_name);
@@ -238,9 +240,9 @@ VAStatus vaPutSurface (
   CHECK_DISPLAY(dpy);
   ctx = CTX(dpy);
   
-  VA_TRACE_FUNC(va_TracePutSurface, dpy, surface, (void *)draw, srcx, srcy, srcw, srch,
-                destx, desty, destw, desth,
-           cliprects, number_cliprects, flags );
+  VA_TRACE_LOG(va_TracePutSurface, dpy, surface, (void *)draw, srcx, srcy, srcw, srch,
+               destx, desty, destw, desth,
+               cliprects, number_cliprects, flags );
   
   return ctx->vtable->vaPutSurface( ctx, surface, (void *)draw, srcx, srcy, srcw, srch,
                                    destx, desty, destw, desth,

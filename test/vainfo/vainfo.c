@@ -39,6 +39,7 @@ if (va_status != VA_STATUS_SUCCESS) {                                   \
 static char * profile_string(VAProfile profile)
 {
     switch (profile) {
+            case VAProfileNone: return "VAProfileNone";
             case VAProfileMPEG2Simple: return "VAProfileMPEG2Simple";
             case VAProfileMPEG2Main: return "VAProfileMPEG2Main";
             case VAProfileMPEG4Simple: return "VAProfileMPEG4Simple";
@@ -53,6 +54,8 @@ static char * profile_string(VAProfile profile)
             case VAProfileH263Baseline: return "VAProfileH263Baseline";
             case VAProfileH264ConstrainedBaseline: return "VAProfileH264ConstrainedBaseline";
             case VAProfileJPEGBaseline: return "VAProfileJPEGBaseline";
+            default:
+                break;
     }
     return "<unknown profile>";
 }
@@ -68,6 +71,9 @@ static char * entrypoint_string(VAEntrypoint entrypoint)
             case VAEntrypointDeblocking:return "VAEntrypointDeblocking";
             case VAEntrypointEncSlice:return "VAEntrypointEncSlice";
             case VAEntrypointEncPicture:return "VAEntrypointEncPicture";
+            case VAEntrypointVideoProc:return "VAEntrypointVideoProc";
+            default:
+                break;
     }
     return "<unknown entrypoint>";
 }
@@ -105,7 +111,7 @@ int main(int argc, const char* argv[])
   printf("%s: Driver version: %s\n", name, driver ? driver : "<unknown>");
 
   printf("%s: Supported profile and entrypoints\n", name);
-  for	(profile = VAProfileMPEG2Simple; profile <= VAProfileH264ConstrainedBaseline; profile++) {
+  for	(profile = VAProfileNone; profile <= VAProfileH264ConstrainedBaseline; profile++) {
       char *profile_str;
 
       va_status = vaQueryConfigEntrypoints(va_dpy, profile, entrypoints, 

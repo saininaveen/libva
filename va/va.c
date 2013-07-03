@@ -26,6 +26,7 @@
 #include "sysdeps.h"
 #include "va.h"
 #include "va_backend.h"
+#include "va_backend_vpp.h"
 #include "va_trace.h"
 #include "va_fool.h"
 
@@ -85,10 +86,10 @@ int va_parseConfig(char *env, char *env_value)
         fclose(fp);
 
     /* no setting in config file, use env setting */
-    if (getenv(env)) {
+    value = getenv(env);
+    if (value) {
         if (env_value)
-            strncpy(env_value, getenv(env), 1024);
-
+            strncpy(env_value, value, 1024);
         return 0;
     }
     
@@ -213,6 +214,13 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
         char *driver_path = (char *) malloc( strlen(driver_dir) +
                                              strlen(driver_name) +
                                              strlen(DRIVER_EXTENSION) + 2 );
+        if (!driver_path) {
+            va_errorMessage("%s L%d Out of memory!n",
+                                __FUNCTION__, __LINE__);
+            free(search_path);    
+            return VA_STATUS_ERROR_ALLOCATION_FAILED;
+        }
+
         strncpy( driver_path, driver_dir, strlen(driver_dir) + 1);
         strncat( driver_path, "/", strlen("/") );
         strncat( driver_path, driver_name, strlen(driver_name) );
@@ -238,6 +246,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 int minor;
             } compatible_versions[] = {
                 { VA_MAJOR_VERSION, VA_MINOR_VERSION },
+                { 0, 33 },
                 { 0, 32 },
                 { -1, }
             };
@@ -260,6 +269,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 dlclose(handle);
             } else {
                 struct VADriverVTable *vtable = ctx->vtable;
+                struct VADriverVTableVPP *vtable_vpp = ctx->vtable_vpp;
 
                 vaStatus = VA_STATUS_SUCCESS;
                 if (!vtable) {
@@ -269,7 +279,16 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 }
                 ctx->vtable = vtable;
 
-                if (VA_STATUS_SUCCESS == vaStatus)
+                if (!vtable_vpp) {
+                    vtable_vpp = calloc(1, sizeof(*vtable_vpp));
+                    if (vtable_vpp)
+                        vtable_vpp->version = VA_DRIVER_VTABLE_VPP_VERSION;
+                    else
+                        vaStatus = VA_STATUS_ERROR_ALLOCATION_FAILED;
+                }
+                ctx->vtable_vpp = vtable_vpp;
+
+                if (init_func && VA_STATUS_SUCCESS == vaStatus)
                     vaStatus = (*init_func)(ctx);
 
                 if (VA_STATUS_SUCCESS == vaStatus) {
@@ -407,6 +426,12 @@ const char *vaErrorStr(VAStatus error_status)
             return "surface is in displaying (may by overlay)" ;
         case VA_STATUS_ERROR_INVALID_IMAGE_FORMAT:
             return "invalid VAImageFormat";
+        case VA_STATUS_ERROR_INVALID_VALUE:
+            return "an invalid/unsupported value was supplied";
+        case VA_STATUS_ERROR_UNSUPPORTED_FILTER:
+            return "the requested filter is not supported";
+        case VA_STATUS_ERROR_INVALID_FILTER_CHAIN:
+            return "an invalid filter chain was supplied";
         case VA_STATUS_ERROR_UNKNOWN:
             return "unknown libva error";
     }
@@ -431,24 +456,30 @@ VAStatus vaInitialize (
 
     va_infoMessage("VA-API version %s\n", VA_VERSION_S);
 
+    vaStatus = va_getDriverName(dpy, &driver_name);
+    va_infoMessage("va_getDriverName() returns %d\n", vaStatus);
+
     driver_name_env = getenv("LIBVA_DRIVER_NAME");
-    if (driver_name_env && geteuid() == getuid()) {
+    if ((VA_STATUS_SUCCESS == vaStatus) &&
+        driver_name_env && (geteuid() == getuid())) {
         /* Don't allow setuid apps to use LIBVA_DRIVER_NAME */
+        if (driver_name) /* memory is allocated in va_getDriverName */
+            free(driver_name);
+        
         driver_name = strdup(driver_name_env);
         vaStatus = VA_STATUS_SUCCESS;
         va_infoMessage("User requested driver '%s'\n", driver_name);
-    } else {
-        vaStatus = va_getDriverName(dpy, &driver_name);
-        va_infoMessage("va_getDriverName() returns %d\n", vaStatus);
     }
 
-    if (VA_STATUS_SUCCESS == vaStatus) {
+    if ((VA_STATUS_SUCCESS == vaStatus) && (driver_name != NULL)) {
         vaStatus = va_openDriver(dpy, driver_name);
         va_infoMessage("va_openDriver() returns %d\n", vaStatus);
 
         *major_version = VA_MAJOR_VERSION;
         *minor_version = VA_MINOR_VERSION;
-    }
+    } else
+        va_errorMessage("va_getDriverName() failed with %s,driver_name=%s\n",
+                        vaErrorStr(vaStatus), driver_name);
 
     if (driver_name)
         free(driver_name);
@@ -480,6 +511,8 @@ VAStatus vaTerminate (
   }
   free(old_ctx->vtable);
   old_ctx->vtable = NULL;
+  free(old_ctx->vtable_vpp);
+  old_ctx->vtable_vpp = NULL;
 
   if (VA_STATUS_SUCCESS == vaStatus)
       pDisplayContext->vaDestroy(pDisplayContext);
@@ -607,7 +640,7 @@ VAStatus vaCreateConfig (
   vaStatus = ctx->vtable->vaCreateConfig ( ctx, profile, entrypoint, attrib_list, num_attribs, config_id );
 
   /* record the current entrypoint for further trace/fool determination */
-  VA_TRACE_FUNC(va_TraceCreateConfig, dpy, profile, entrypoint, attrib_list, num_attribs, config_id);
+  VA_TRACE_LOG(va_TraceCreateConfig, dpy, profile, entrypoint, attrib_list, num_attribs, config_id);
   VA_FOOL_FUNC(va_FoolCreateConfig, dpy, profile, entrypoint, attrib_list, num_attribs, config_id);
   
   return vaStatus;
@@ -641,26 +674,203 @@ VAStatus vaQueryConfigAttributes (
   return ctx->vtable->vaQueryConfigAttributes( ctx, config_id, profile, entrypoint, attrib_list, num_attribs);
 }
 
-VAStatus vaCreateSurfaces (
-    VADisplay dpy,
-    int width,
-    int height,
-    int format,
-    int num_surfaces,
-    VASurfaceID *surfaces	/* out */
+/* XXX: this is a slow implementation that will be removed */
+static VAStatus
+va_impl_query_surface_attributes(
+    VADriverContextP    ctx,
+    VAConfigID          config,
+    VASurfaceAttrib    *out_attribs,
+    unsigned int       *out_num_attribs_ptr
 )
 {
-  VADriverContextP ctx;
-  VAStatus vaStatus;
+    VASurfaceAttrib *attribs = NULL;
+    unsigned int num_attribs, n;
+    VASurfaceAttrib *out_attrib;
+    unsigned int out_num_attribs;
+    VAImageFormat *image_formats = NULL;
+    int num_image_formats, i;
+    VAStatus va_status;
 
-  CHECK_DISPLAY(dpy);
-  ctx = CTX(dpy);
+    /* List of surface attributes to query */
+    struct va_surface_attrib_map {
+        VASurfaceAttribType type;
+        VAGenericValueType  value_type;
+    };
+    static const struct va_surface_attrib_map attribs_map[] = {
+        { VASurfaceAttribMinWidth,      VAGenericValueTypeInteger },
+        { VASurfaceAttribMaxWidth,      VAGenericValueTypeInteger },
+        { VASurfaceAttribMinHeight,     VAGenericValueTypeInteger },
+        { VASurfaceAttribMaxHeight,     VAGenericValueTypeInteger },
+        { VASurfaceAttribMemoryType,    VAGenericValueTypeInteger },
+        { VASurfaceAttribNone, }
+    };
 
-  vaStatus = ctx->vtable->vaCreateSurfaces( ctx, width, height, format, num_surfaces, surfaces );
+    if (!out_attribs || !out_num_attribs_ptr)
+        return VA_STATUS_ERROR_INVALID_PARAMETER;
+    if (!ctx->vtable->vaGetSurfaceAttributes)
+        return VA_STATUS_ERROR_UNIMPLEMENTED;
 
-  VA_TRACE_LOG(va_TraceCreateSurface, dpy, width, height, format, num_surfaces, surfaces);
-  
-  return vaStatus;
+    num_image_formats = ctx->max_image_formats;
+    image_formats = malloc(num_image_formats * sizeof(*image_formats));
+    if (!image_formats) {
+        va_status = VA_STATUS_ERROR_ALLOCATION_FAILED;
+        goto end;
+    }
+
+    va_status = ctx->vtable->vaQueryImageFormats(
+        ctx, image_formats, &num_image_formats);
+    if (va_status != VA_STATUS_SUCCESS)
+        goto end;
+
+    num_attribs = VASurfaceAttribCount + num_image_formats;
+    attribs = malloc(num_attribs * sizeof(*attribs));
+    if (!attribs) {
+        va_status = VA_STATUS_ERROR_ALLOCATION_FAILED;
+        goto end;
+    }
+
+    /* Initialize with base surface attributes, except pixel-formats */
+    for (n = 0; attribs_map[n].type != VASurfaceAttribNone; n++) {
+        VASurfaceAttrib * const attrib = &attribs[n];
+        attrib->type = attribs_map[n].type;
+        attrib->flags = VA_SURFACE_ATTRIB_GETTABLE;
+        attrib->value.type = attribs_map[n].value_type;
+    }
+
+    /* Append image formats */
+    for (i = 0; i < num_image_formats; i++) {
+        VASurfaceAttrib * const attrib = &attribs[n];
+        attrib->type = VASurfaceAttribPixelFormat;
+        attrib->flags = VA_SURFACE_ATTRIB_GETTABLE|VA_SURFACE_ATTRIB_SETTABLE;
+        attrib->value.type = VAGenericValueTypeInteger;
+        attrib->value.value.i = image_formats[i].fourcc;
+        if (++n == num_attribs) {
+            va_status = VA_STATUS_ERROR_ALLOCATION_FAILED;
+            goto end;
+        }
+    }
+    num_attribs = n;
+
+    va_status = ctx->vtable->vaGetSurfaceAttributes(
+        ctx, config, attribs, num_attribs);
+    if (va_status != VA_STATUS_SUCCESS)
+        goto end;
+
+    /* Remove invalid entries */
+    out_num_attribs = 0;
+    for (n = 0; n < num_attribs; n++) {
+        VASurfaceAttrib * const attrib = &attribs[n];
+
+        if (attrib->flags == VA_SURFACE_ATTRIB_NOT_SUPPORTED)
+            continue;
+
+        // Accept all surface attributes that are not pixel-formats
+        if (attrib->type != VASurfaceAttribPixelFormat) {
+            out_num_attribs++;
+            continue;
+        }
+
+        // Drop invalid pixel-format attribute
+        if (!attrib->value.value.i) {
+            attrib->flags = VA_SURFACE_ATTRIB_NOT_SUPPORTED;
+            continue;
+        }
+
+        // Check for duplicates
+        int is_duplicate = 0;
+        for (i = n - 1; i >= 0 && !is_duplicate; i--) {
+            const VASurfaceAttrib * const prev_attrib = &attribs[i];
+            if (prev_attrib->type != VASurfaceAttribPixelFormat)
+                break;
+            is_duplicate = prev_attrib->value.value.i == attrib->value.value.i;
+        }
+        if (is_duplicate)
+            attrib->flags = VA_SURFACE_ATTRIB_NOT_SUPPORTED;
+        else
+            out_num_attribs++;
+    }
+
+    if (*out_num_attribs_ptr < out_num_attribs) {
+        *out_num_attribs_ptr = out_num_attribs;
+        va_status = VA_STATUS_ERROR_MAX_NUM_EXCEEDED;
+        goto end;
+    }
+
+    out_attrib = out_attribs;
+    for (n = 0; n < num_attribs; n++) {
+        const VASurfaceAttrib * const attrib = &attribs[n];
+        if (attrib->flags == VA_SURFACE_ATTRIB_NOT_SUPPORTED)
+            continue;
+        *out_attrib++ = *attrib;
+    }
+
+end:
+    free(attribs);
+    free(image_formats);
+    return va_status;
+}
+
+VAStatus
+vaQuerySurfaceAttributes(
+    VADisplay           dpy,
+    VAConfigID          config,
+    VASurfaceAttrib    *attrib_list,
+    unsigned int       *num_attribs
+)
+{
+    VADriverContextP ctx;
+    VAStatus vaStatus;
+
+    CHECK_DISPLAY(dpy);
+    ctx = CTX(dpy);
+    if (!ctx)
+        return VA_STATUS_ERROR_INVALID_DISPLAY;
+
+    if (!ctx->vtable->vaQuerySurfaceAttributes)
+        return va_impl_query_surface_attributes(ctx, config,
+            attrib_list, num_attribs);
+
+    vaStatus = ctx->vtable->vaQuerySurfaceAttributes(ctx, config,
+        attrib_list, num_attribs);
+    return vaStatus;
+}
+
+VAStatus
+vaCreateSurfaces(
+    VADisplay           dpy,
+    unsigned int        format,
+    unsigned int        width,
+    unsigned int        height,
+    VASurfaceID        *surfaces,
+    unsigned int        num_surfaces,
+    VASurfaceAttrib    *attrib_list,
+    unsigned int        num_attribs
+)
+{
+    VADriverContextP ctx;
+    VAStatus vaStatus;
+
+    CHECK_DISPLAY(dpy);
+    ctx = CTX(dpy);
+    if (!ctx)
+        return VA_STATUS_ERROR_INVALID_DISPLAY;
+
+    if (ctx->vtable->vaCreateSurfaces2)
+        return ctx->vtable->vaCreateSurfaces2(ctx, format, width, height,
+                                              surfaces, num_surfaces,
+                                              attrib_list, num_attribs);
+
+    if (attrib_list && num_attribs > 0)
+        return VA_STATUS_ERROR_ATTR_NOT_SUPPORTED;
+
+    vaStatus = ctx->vtable->vaCreateSurfaces(ctx, width, height, format,
+                                             num_surfaces, surfaces);
+
+    VA_TRACE_LOG(va_TraceCreateSurfaces,
+                 dpy, width, height, format, num_surfaces, surfaces,
+                 attrib_list, num_attribs);
+
+    return vaStatus;
 }
 
 
@@ -698,7 +908,7 @@ VAStatus vaCreateContext (
                                       flag, render_targets, num_render_targets, context );
 
   /* keep current encode/decode resoluton */
-  VA_TRACE_FUNC(va_TraceCreateContext, dpy, config_id, picture_width, picture_height, flag, render_targets, num_render_targets, context);
+  VA_TRACE_LOG(va_TraceCreateContext, dpy, config_id, picture_width, picture_height, flag, render_targets, num_render_targets, context);
 
   return vaStatus;
 }
@@ -726,15 +936,22 @@ VAStatus vaCreateBuffer (
 )
 {
   VADriverContextP ctx;
+  VAStatus vaStatus;
+  int ret = 0;
+  
   CHECK_DISPLAY(dpy);
   ctx = CTX(dpy);
-  int ret = 0;
 
   VA_FOOL_FUNC(va_FoolCreateBuffer, dpy, context, type, size, num_elements, data, buf_id);
   if (ret)
       return VA_STATUS_SUCCESS;
 
-  return ctx->vtable->vaCreateBuffer( ctx, context, type, size, num_elements, data, buf_id);
+  vaStatus = ctx->vtable->vaCreateBuffer( ctx, context, type, size, num_elements, data, buf_id);
+
+  VA_TRACE_LOG(va_TraceCreateBuffer,
+               dpy, context, type, size, num_elements, data, buf_id);
+  
+  return vaStatus;
 }
 
 VAStatus vaBufferSetNumElements (
@@ -804,6 +1021,9 @@ VAStatus vaDestroyBuffer (
   ctx = CTX(dpy);
 
   VA_FOOL_RETURN();
+
+  VA_TRACE_LOG(va_TraceDestroyBuffer,
+               dpy, buffer_id);
   
   return ctx->vtable->vaDestroyBuffer( ctx, buffer_id );
 }
@@ -842,7 +1062,7 @@ VAStatus vaBeginPicture (
   CHECK_DISPLAY(dpy);
   ctx = CTX(dpy);
 
-  VA_TRACE_FUNC(va_TraceBeginPicture, dpy, context, render_target);
+  VA_TRACE_LOG(va_TraceBeginPicture, dpy, context, render_target);
   VA_FOOL_RETURN();
   
   va_status = ctx->vtable->vaBeginPicture( ctx, context, render_target );
@@ -873,19 +1093,16 @@ VAStatus vaEndPicture (
     VAContextID context
 )
 {
-  VAStatus va_status;
+  VAStatus va_status = VA_STATUS_SUCCESS;
   VADriverContextP ctx;
 
   CHECK_DISPLAY(dpy);
   ctx = CTX(dpy);
 
-  /* dump encode source surface */
-  VA_TRACE_SURFACE(va_TraceEndPicture, dpy, context, 0);
-  /* return directly if do dummy operation */
-  VA_FOOL_RETURN();
-  
-  va_status = ctx->vtable->vaEndPicture( ctx, context );
-  /* dump decode dest surface */
+  if (fool_codec == 0)
+      va_status = ctx->vtable->vaEndPicture( ctx, context );
+
+  /* dump surface content */
   VA_TRACE_SURFACE(va_TraceEndPicture, dpy, context, 1);
 
   return va_status;
@@ -1398,4 +1615,80 @@ VAStatus vaUnlockSurface(VADisplay dpy,
   ctx = CTX(dpy);
 
   return ctx->vtable->vaUnlockSurface( ctx, surface );
+}
+
+/* Video Processing */
+#define VA_VPP_INIT_CONTEXT(ctx, dpy) do {              \
+        CHECK_DISPLAY(dpy);                             \
+        ctx = CTX(dpy);                                 \
+        if (!ctx)                                       \
+            return VA_STATUS_ERROR_INVALID_DISPLAY;     \
+    } while (0)
+
+#define VA_VPP_INVOKE(dpy, func, args) do {             \
+        if (!ctx->vtable_vpp->va##func)                 \
+            return VA_STATUS_ERROR_UNIMPLEMENTED;       \
+        status = ctx->vtable_vpp->va##func args;        \
+    } while (0)
+
+VAStatus
+vaQueryVideoProcFilters(
+    VADisplay           dpy,
+    VAContextID         context,
+    VAProcFilterType   *filters,
+    unsigned int       *num_filters
+)
+{
+    VADriverContextP ctx;
+    VAStatus status;
+
+    VA_VPP_INIT_CONTEXT(ctx, dpy);
+    VA_VPP_INVOKE(
+        ctx,
+        QueryVideoProcFilters,
+        (ctx, context, filters, num_filters)
+    );
+    return status;
+}
+
+VAStatus
+vaQueryVideoProcFilterCaps(
+    VADisplay           dpy,
+    VAContextID         context,
+    VAProcFilterType    type,
+    void               *filter_caps,
+    unsigned int       *num_filter_caps
+)
+{
+    VADriverContextP ctx;
+    VAStatus status;
+
+    VA_VPP_INIT_CONTEXT(ctx, dpy);
+    VA_VPP_INVOKE(
+        ctx,
+        QueryVideoProcFilterCaps,
+        (ctx, context, type, filter_caps, num_filter_caps)
+    );
+    return status;
+}
+
+VAStatus
+vaQueryVideoProcPipelineCaps(
+    VADisplay           dpy,
+    VAContextID         context,
+    VABufferID         *filters,
+    unsigned int        num_filters,
+    VAProcPipelineCaps *pipeline_caps
+)
+{
+    VADriverContextP ctx;
+    VAStatus status;
+
+    VA_VPP_INIT_CONTEXT(ctx, dpy);
+    VA_VPP_INVOKE(
+        ctx,
+        QueryVideoProcPipelineCaps,
+        (ctx, context, filters, num_filters, pipeline_caps)
+    );
+    return status;
 }
