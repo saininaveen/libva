@@ -56,7 +56,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = avcenc$(EXEEXT) mpeg2enc$(EXEEXT) h264encode$(EXEEXT)
+bin_PROGRAMS = avcenc$(EXEEXT) mpeg2vaenc$(EXEEXT) h264encode$(EXEEXT)
 subdir = test/encode
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -89,12 +89,12 @@ h264encode_DEPENDENCIES = $(top_builddir)/va/libva.la \
 h264encode_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(h264encode_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-am_mpeg2enc_OBJECTS = mpeg2enc-mpeg2enc.$(OBJEXT)
-mpeg2enc_OBJECTS = $(am_mpeg2enc_OBJECTS)
-mpeg2enc_DEPENDENCIES = $(top_builddir)/va/libva.la \
+am_mpeg2vaenc_OBJECTS = mpeg2vaenc-mpeg2vaenc.$(OBJEXT)
+mpeg2vaenc_OBJECTS = $(am_mpeg2vaenc_OBJECTS)
+mpeg2vaenc_DEPENDENCIES = $(top_builddir)/va/libva.la \
 	$(top_builddir)/test/common/libva-display.la
-mpeg2enc_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(mpeg2enc_CFLAGS) \
+mpeg2vaenc_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(mpeg2vaenc_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -122,9 +122,10 @@ am__v_CCLD_0 = @echo "  CCLD  " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(avcenc_SOURCES) $(h264encode_SOURCES) $(mpeg2enc_SOURCES)
+SOURCES = $(avcenc_SOURCES) $(h264encode_SOURCES) \
+	$(mpeg2vaenc_SOURCES)
 DIST_SOURCES = $(avcenc_SOURCES) $(h264encode_SOURCES) \
-	$(mpeg2enc_SOURCES)
+	$(mpeg2vaenc_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -301,9 +302,9 @@ avcenc_LDADD = \
 	$(top_builddir)/test/common/libva-display.la \
 	-lpthread
 
-mpeg2enc_SOURCES = mpeg2enc.c
-mpeg2enc_CFLAGS = -I$(top_srcdir)/test/common
-mpeg2enc_LDADD = \
+mpeg2vaenc_SOURCES = mpeg2vaenc.c
+mpeg2vaenc_CFLAGS = -I$(top_srcdir)/test/common
+mpeg2vaenc_LDADD = \
 	$(top_builddir)/va/libva.la \
 	$(top_builddir)/test/common/libva-display.la \
 	-lpthread
@@ -391,9 +392,9 @@ avcenc$(EXEEXT): $(avcenc_OBJECTS) $(avcenc_DEPENDENCIES) $(EXTRA_avcenc_DEPENDE
 h264encode$(EXEEXT): $(h264encode_OBJECTS) $(h264encode_DEPENDENCIES) $(EXTRA_h264encode_DEPENDENCIES) 
 	@rm -f h264encode$(EXEEXT)
 	$(AM_V_CCLD)$(h264encode_LINK) $(h264encode_OBJECTS) $(h264encode_LDADD) $(LIBS)
-mpeg2enc$(EXEEXT): $(mpeg2enc_OBJECTS) $(mpeg2enc_DEPENDENCIES) $(EXTRA_mpeg2enc_DEPENDENCIES) 
-	@rm -f mpeg2enc$(EXEEXT)
-	$(AM_V_CCLD)$(mpeg2enc_LINK) $(mpeg2enc_OBJECTS) $(mpeg2enc_LDADD) $(LIBS)
+mpeg2vaenc$(EXEEXT): $(mpeg2vaenc_OBJECTS) $(mpeg2vaenc_DEPENDENCIES) $(EXTRA_mpeg2vaenc_DEPENDENCIES) 
+	@rm -f mpeg2vaenc$(EXEEXT)
+	$(AM_V_CCLD)$(mpeg2vaenc_LINK) $(mpeg2vaenc_OBJECTS) $(mpeg2vaenc_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -403,7 +404,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/avcenc-avcenc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/h264encode-h264encode.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpeg2enc-mpeg2enc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -454,19 +455,19 @@ h264encode-h264encode.obj: h264encode.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(h264encode_CFLAGS) $(CFLAGS) -c -o h264encode-h264encode.obj `if test -f 'h264encode.c'; then $(CYGPATH_W) 'h264encode.c'; else $(CYGPATH_W) '$(srcdir)/h264encode.c'; fi`
 
-mpeg2enc-mpeg2enc.o: mpeg2enc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2enc_CFLAGS) $(CFLAGS) -MT mpeg2enc-mpeg2enc.o -MD -MP -MF $(DEPDIR)/mpeg2enc-mpeg2enc.Tpo -c -o mpeg2enc-mpeg2enc.o `test -f 'mpeg2enc.c' || echo '$(srcdir)/'`mpeg2enc.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpeg2enc-mpeg2enc.Tpo $(DEPDIR)/mpeg2enc-mpeg2enc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mpeg2enc.c' object='mpeg2enc-mpeg2enc.o' libtool=no @AMDEPBACKSLASH@
+mpeg2vaenc-mpeg2vaenc.o: mpeg2vaenc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2vaenc_CFLAGS) $(CFLAGS) -MT mpeg2vaenc-mpeg2vaenc.o -MD -MP -MF $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Tpo -c -o mpeg2vaenc-mpeg2vaenc.o `test -f 'mpeg2vaenc.c' || echo '$(srcdir)/'`mpeg2vaenc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Tpo $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mpeg2vaenc.c' object='mpeg2vaenc-mpeg2vaenc.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2enc_CFLAGS) $(CFLAGS) -c -o mpeg2enc-mpeg2enc.o `test -f 'mpeg2enc.c' || echo '$(srcdir)/'`mpeg2enc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2vaenc_CFLAGS) $(CFLAGS) -c -o mpeg2vaenc-mpeg2vaenc.o `test -f 'mpeg2vaenc.c' || echo '$(srcdir)/'`mpeg2vaenc.c
 
-mpeg2enc-mpeg2enc.obj: mpeg2enc.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2enc_CFLAGS) $(CFLAGS) -MT mpeg2enc-mpeg2enc.obj -MD -MP -MF $(DEPDIR)/mpeg2enc-mpeg2enc.Tpo -c -o mpeg2enc-mpeg2enc.obj `if test -f 'mpeg2enc.c'; then $(CYGPATH_W) 'mpeg2enc.c'; else $(CYGPATH_W) '$(srcdir)/mpeg2enc.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpeg2enc-mpeg2enc.Tpo $(DEPDIR)/mpeg2enc-mpeg2enc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mpeg2enc.c' object='mpeg2enc-mpeg2enc.obj' libtool=no @AMDEPBACKSLASH@
+mpeg2vaenc-mpeg2vaenc.obj: mpeg2vaenc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2vaenc_CFLAGS) $(CFLAGS) -MT mpeg2vaenc-mpeg2vaenc.obj -MD -MP -MF $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Tpo -c -o mpeg2vaenc-mpeg2vaenc.obj `if test -f 'mpeg2vaenc.c'; then $(CYGPATH_W) 'mpeg2vaenc.c'; else $(CYGPATH_W) '$(srcdir)/mpeg2vaenc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Tpo $(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mpeg2vaenc.c' object='mpeg2vaenc-mpeg2vaenc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2enc_CFLAGS) $(CFLAGS) -c -o mpeg2enc-mpeg2enc.obj `if test -f 'mpeg2enc.c'; then $(CYGPATH_W) 'mpeg2enc.c'; else $(CYGPATH_W) '$(srcdir)/mpeg2enc.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2vaenc_CFLAGS) $(CFLAGS) -c -o mpeg2vaenc-mpeg2vaenc.obj `if test -f 'mpeg2vaenc.c'; then $(CYGPATH_W) 'mpeg2vaenc.c'; else $(CYGPATH_W) '$(srcdir)/mpeg2vaenc.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

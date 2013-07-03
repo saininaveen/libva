@@ -88,6 +88,9 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
+/* Defined to the versioned __vaDriverInit function name */
+#undef VA_DRIVER_INIT_FUNC
+
 /* Version number of package */
 #undef VERSION
 
