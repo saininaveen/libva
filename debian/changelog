@@ -1,6 +1,10 @@
 libva (1.2.1-1) UNRELEASED; urgency=low
 
   * New upstream release
+    - debian/patches/: patchset dropped completely
+      - 0001-FTBFS_on_GNU-kFreeBSD.patch became useless
+      - 0002-Remove_unneeded_dependencies.patch applied upstream
+    - debian/rules: dh_makeshlibs bump 1.1.0~ => 1.2.0~
 
  -- Matteo F. Vescovi <mfv.debian@gmail.com>  Wed, 03 Jul 2013 15:45:27 +0200
 
