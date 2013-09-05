@@ -1,2 +1,5 @@
 debian.upstream/changelog
 debian.upstream/control
+test/v4l_h264/decode/Makefile
+test/v4l_h264/encode/Makefile
+test/v4l_h264/Makefile
