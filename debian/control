@@ -32,8 +32,7 @@ Depends:
  libva-tpi1 (= ${binary:Version}),
  libva-x11-1 (= ${binary:Version}),
  libva1 (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends}
+ ${misc:Depends}
 Description: Video Acceleration (VA) API for Linux -- development files
  Video Acceleration API (VA API) is a library ("libVA") and API specification
  which enables and provides access to graphics hardware (GPU) acceleration for
