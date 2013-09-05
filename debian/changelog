@@ -1,5 +1,6 @@
 libva (1.2.1-1) experimental; urgency=low
 
+  [ Matteo F. Vescovi ]
   * New upstream release
     - debian/patches/: patchset dropped completely
       - 0001-FTBFS_on_GNU-kFreeBSD.patch became useless
@@ -7,7 +8,13 @@ libva (1.2.1-1) experimental; urgency=low
     - debian/rules: dh_makeshlibs bump 1.1.0~ => 1.2.0~
   * debian/control: Vcs-Git URL updated
 
- -- Matteo F. Vescovi <mfv.debian@gmail.com>  Wed, 31 Jul 2013 15:19:12 +0200
+  [ Sebastian Ramacher ]
+  * debian/copyright: Update copyright years. (Closes: #719602)
+  * debian/control: Remove unnecessary ${shlib:Depends} from libva-dev's
+    Depends.
+  * debian/clean: Make sure that libva builds twice in a row.
+
+ -- Matteo F. Vescovi <mfv.debian@gmail.com>  Thu, 05 Sep 2013 20:57:43 +0200
 
 libva (1.1.1-3) unstable; urgency=low
 
