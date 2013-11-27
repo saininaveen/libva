@@ -5,7 +5,7 @@ Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alio
 Uploaders:
  Andres Mejia <amejia@debian.org>,
  Reinhard Tartler <siretart@tauware.de>,
- Matteo F. Vescovi <mfv.debian@gmail.com>
+ Matteo F. Vescovi <mfvescovi@gmail.com>
 Build-Depends:
  debhelper (>= 9),
  dh-autoreconf,
