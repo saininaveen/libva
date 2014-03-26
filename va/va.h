@@ -78,6 +78,7 @@
 #ifndef _VA_H_
 #define _VA_H_
 
+#include <stdint.h>
 #include <va/va_version.h>
 
 #ifdef __cplusplus
@@ -286,7 +287,8 @@ typedef enum
     VAProfileVC1Advanced		= 10,
     VAProfileH263Baseline		= 11,
     VAProfileJPEGBaseline               = 12,
-    VAProfileH264ConstrainedBaseline = 13
+    VAProfileH264ConstrainedBaseline    = 13,
+    VAProfileVP8Version0_3              = 14
 } VAProfile;
 
 /* 
@@ -302,7 +304,6 @@ typedef enum
     VAEntrypointEncSlice	= 6,	/* slice level encode */
     VAEntrypointEncPicture 	= 7,	/* pictuer encode, JPEG, etc */
     VAEntrypointVideoProc       = 10,   /**< Video pre/post-processing. */
-    VAEntrypointMax
 } VAEntrypoint;
 
 /* Currently defined configuration attribute types */
@@ -873,6 +874,7 @@ typedef enum
     VAProtectedSliceDataBufferType	= 10,
     VAQMatrixBufferType                 = 11,
     VAHuffmanTableBufferType            = 12,
+    VAProbabilityBufferType             = 13,
 
 /* Following are encode buffer types */
     VAEncCodedBufferType		= 21,
@@ -1979,6 +1981,8 @@ VAStatus vaQuerySurfaceError(
 #define VA_FOURCC_BGRX		0x58524742
 #define VA_FOURCC_ARGB		0x42475241
 #define VA_FOURCC_XRGB		0x42475258
+#define VA_FOURCC_ABGR          0x52474241
+#define VA_FOURCC_XBGR          0x52474258
 #define VA_FOURCC_UYVY          0x59565955
 #define VA_FOURCC_YUY2          0x32595559
 #define VA_FOURCC_AYUV          0x56555941
