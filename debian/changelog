@@ -1,4 +1,4 @@
-libva (1.3.0-1) UNRELEASED; urgency=medium
+libva (1.3.0-1) unstable; urgency=medium
 
   * New upstream release (Closes: #742336)
     - debian/rules: shlibs bump 1.2.0 => 1.3.0
@@ -6,7 +6,7 @@ libva (1.3.0-1) UNRELEASED; urgency=medium
   * debian/control: Uploader e-mail address updated
   * debian/control: S-V bump 3.9.4 => 3.9.5 (no changes needed)
 
- -- Matteo F. Vescovi <mfvescovi@gmail.com>  Wed, 26 Mar 2014 15:29:32 +0100
+ -- Matteo F. Vescovi <mfvescovi@gmail.com>  Mon, 31 Mar 2014 14:42:14 +0200
 
 libva (1.2.1-2) unstable; urgency=low
 
