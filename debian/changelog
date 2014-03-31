@@ -2,7 +2,7 @@ libva (1.3.0-1) UNRELEASED; urgency=medium
 
   * New upstream release (Closes: #742336)
     - debian/rules: shlibs bump 1.2.0 => 1.3.0
-    - debian/: wayland support added
+    - debian/: wayland support added (Closes: #743069)
   * debian/control: Uploader e-mail address updated
   * debian/control: S-V bump 3.9.4 => 3.9.5 (no changes needed)
 
