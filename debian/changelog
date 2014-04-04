@@ -1,3 +1,13 @@
+libva (1.3.0-2) UNRELEASED; urgency=medium
+
+  * debian/copyright: completely re-worked.
+     - to comply DEP-5
+     - to fix license issues (Closes: #743485)
+  * debian/control: Uploaders list updated. (Closes: #743549)
+    Thanks to Andres Mejia (amejia) for his efforts on this package.
+
+ -- Matteo F. Vescovi <mfvescovi@gmail.com>  Fri, 04 Apr 2014 10:52:36 +0200
+
 libva (1.3.0-1) unstable; urgency=medium
 
   * New upstream release (Closes: #742336)
