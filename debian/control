@@ -3,7 +3,6 @@ Section: libs
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders:
- Andres Mejia <amejia@debian.org>,
  Reinhard Tartler <siretart@tauware.de>,
  Matteo F. Vescovi <mfvescovi@gmail.com>
 Build-Depends:
