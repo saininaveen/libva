@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libva
-Upstream-Author: Waldo Bastian <waldo.bastian@intel.com>
-                 Jonathan Bian <jonathan.bian@intel.com>
+Upstream-Contact: Waldo Bastian <waldo.bastian@intel.com>
+                  Jonathan Bian <jonathan.bian@intel.com>
 Source: http://cgit.freedesktop.org/libva/
 
 Files: debian/*
