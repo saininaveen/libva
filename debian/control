@@ -32,7 +32,7 @@ Depends:
  libva-glx1 (= ${binary:Version}),
  libva-tpi1 (= ${binary:Version}),
  libva-x11-1 (= ${binary:Version}),
- libva-wayland1 (= ${binary:Version}),
+ libva-wayland1 (= ${binary:Version}) [linux-any],
  libva1 (= ${binary:Version}),
  ${misc:Depends}
 Description: Video Acceleration (VA) API for Linux -- development files
@@ -164,7 +164,7 @@ Description: Video Acceleration (VA) API for Linux -- DRM runtime
  This package provides the libva-drm library.
 
 Package: libva-wayland1
-Architecture: any
+Architecture: linux-any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends:
