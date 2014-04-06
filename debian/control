@@ -12,6 +12,7 @@ Build-Depends:
  libdrm-dev,
  libegl1-mesa-dev,
  libgl1-mesa-dev | libgl-dev,
+ libwayland-dev (>= 1.0.0) [linux-any],
  libx11-dev,
  libxext-dev,
  libxfixes-dev,
