@@ -18,6 +18,3 @@ override_dh_makeshlibs:
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(confflags)
-
-get-orig-source:
-	$(dir $_)libva-get-orig-source
