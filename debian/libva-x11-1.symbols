@@ -1,0 +1,3 @@
+libva-x11.so.1 libva-x11-1 #MINVER#
+ vaGetDisplay@Base 1.0.3
+ vaPutSurface@Base 1.0.3
