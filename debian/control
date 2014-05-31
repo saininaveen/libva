@@ -206,6 +206,7 @@ Description: Video Acceleration (VA) API for Linux -- info program
 Package: va-driver-all
 Architecture: any
 Section: video
+Multi-Arch: same
 Depends:
  ${misc:Depends},
  i965-va-driver [any-amd64 any-i386],
