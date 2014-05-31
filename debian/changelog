@@ -1,8 +1,15 @@
-libva (1.3.1-2) UNRELEASED; urgency=medium
+libva (1.3.1-2) unstable; urgency=medium
 
-  * 
+  * debian/control:
+    - Add automake (>= 1:1.3.2) to Build-Depends. Running autoreconf fails
+      otherwise due to a bug that has been fixed in automake 1.3.2. (Closes:
+      #749649)
+    - Add va-driver-all metapackage and add va-driver-all | va-driver to
+      libva1's Recommends similar to xserver-xorg-video-all. This will pull in
+      drivers per default but one can still get rid of them if no VA API
+      capable GPU is present. (Closes: #703544, LP: #1301415)
 
- -- Sebastian Ramacher <sramacher@debian.org>  Thu, 29 May 2014 12:33:17 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Sat, 31 May 2014 17:20:35 +0200
 
 libva (1.3.1-1) unstable; urgency=medium
 
