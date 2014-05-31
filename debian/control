@@ -55,6 +55,8 @@ Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
+Recommends:
+ va-driver-all | va-driver
 Breaks:
  vlc-nox (<< 1.1.5-3)
 Description: Video Acceleration (VA) API for Linux -- runtime
@@ -200,3 +202,15 @@ Description: Video Acceleration (VA) API for Linux -- info program
  can also freely use this API for hardware accelerated video decoding.
  .
  This package provides the vainfo program.
+
+Package: va-driver-all
+Architecture: any
+Section: video
+Depends:
+ ${misc:Depends},
+ i965-va-driver [any-amd64 any-i386],
+ vdpau-va-driver
+Description: Video Acceleration (VA) API -- driver metapackage
+ This package depends on the full suite of drivers for the Video Acceleration
+ API (VA API). It does not provide any drivers itself, and may be removed if
+ you wish to only have certain drivers installed.
