@@ -1,6 +1,7 @@
 libva (1.3.1-3) UNRELEASED; urgency=medium
 
-  * 
+  * debian/use-after-free.patch: Fix use after free error in vaTerminate
+    (upstream patch). (Closes: #750429) (LP: #1325873)
 
  -- Sebastian Ramacher <sramacher@debian.org>  Tue, 03 Jun 2014 14:28:46 +0200
 
