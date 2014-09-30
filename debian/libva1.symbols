@@ -1,6 +1,9 @@
 libva.so.1 libva1 #MINVER#
+* Build-Depends-Package: libva-dev
  VA_API_0.32.0@VA_API_0.32.0 1.2.0
  VA_API_0.33.0@VA_API_0.33.0 1.2.0
+ (optional|internal)fool_postp@Base 1.0.6
+ (optional|internal)trace_flag@Base 1.0.3
  vaAcquireBufferHandle@Base 1.4.0
  vaAssociateSubpicture@Base 1.0.3
  vaBeginPicture@Base 1.0.3
@@ -59,3 +62,4 @@ libva.so.1 libva1 #MINVER#
  vaSyncSurface@Base 1.0.3
  vaTerminate@Base 1.0.3
  vaUnmapBuffer@Base 1.0.3
+ (optional|internal)va_TracePutSurface@Base 1.0.6
