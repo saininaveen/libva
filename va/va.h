@@ -78,6 +78,7 @@
 #ifndef _VA_H_
 #define _VA_H_
 
+#include <stddef.h>
 #include <stdint.h>
 #include <va/va_version.h>
 
@@ -178,7 +179,9 @@ typedef int VAStatus;	/** Return status type from functions */
 /** \brief An invalid filter chain was supplied. */
 #define VA_STATUS_ERROR_INVALID_FILTER_CHAIN    0x00000021
 /** \brief Indicate HW busy (e.g. run multiple encoding simultaneously). */
-#define VA_STATUS_ERROR_HW_BUSY                 0x00000022
+#define VA_STATUS_ERROR_HW_BUSY	                0x00000022
+/** \brief An unsupported memory type was supplied. */
+#define VA_STATUS_ERROR_UNSUPPORTED_MEMORY_TYPE 0x00000024
 #define VA_STATUS_ERROR_UNKNOWN			0xFFFFFFFF
 
 /** De-interlacing flags for vaPutSurface() */
@@ -287,7 +290,9 @@ typedef enum
     VAProfileH263Baseline		= 11,
     VAProfileJPEGBaseline               = 12,
     VAProfileH264ConstrainedBaseline    = 13,
-    VAProfileVP8Version0_3              = 14
+    VAProfileVP8Version0_3              = 14,
+    VAProfileH264MultiviewHigh          = 15,
+    VAProfileH264StereoHigh             = 16
 } VAProfile;
 
 /**
@@ -384,6 +389,15 @@ typedef enum
      * through VAEncSliceParameterBufferH264::macroblock_info.
      */
     VAConfigAttribEncMacroblockInfo     = 16,
+    /**
+     * \brief Encoding quality range attribute. Read-only.
+     *
+     * This attribute conveys whether the driver supports different quality level settings
+     * for encoding. A value less than or equal to 1 means that the encoder only has a single
+     * quality setting, and a value greater than 1 represents the number of quality levels 
+     * that can be configured. e.g. a value of 2 means there are two distinct quality levels. 
+     */
+    VAConfigAttribEncQualityRange     = 21,
     /**@}*/
     VAConfigAttribTypeMax
 } VAConfigAttribType;
@@ -661,6 +675,9 @@ typedef enum {
     VASurfaceAttribMemoryType,
     /** \brief External buffer descriptor (pointer, write). */
     VASurfaceAttribExternalBufferDescriptor,
+    /** \brief Surface usage hint, gives the driver a hint of intended usage 
+     *  to optimize allocation (e.g. tiling) (int, read/write). */
+    VASurfaceAttribUsageHint,
     /** \brief Number of surface attributes. */
     VASurfaceAttribCount
 } VASurfaceAttribType;
@@ -731,6 +748,21 @@ typedef struct _VASurfaceAttribExternalBuffers {
 #define VA_SURFACE_EXTBUF_DESC_WC		0x00000008
 /** \brief Memory is protected */
 #define VA_SURFACE_EXTBUF_DESC_PROTECTED        0x80000000
+
+/** @name VASurfaceAttribUsageHint attribute usage hint flags */
+/**@{*/
+/** \brief Surface usage not indicated. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_GENERIC 	0x00000000
+/** \brief Surface used by video decoder. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_DECODER 	0x00000001
+/** \brief Surface used by video encoder. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_ENCODER 	0x00000002
+/** \brief Surface read by video post-processing. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_VPP_READ 	0x00000004
+/** \brief Surface written by video post-processing. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_VPP_WRITE 	0x00000008
+/** \brief Surface used for display. */
+#define VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY 	0x00000010
 
 /**@}*/
 
@@ -884,6 +916,7 @@ typedef enum
     VAEncPackedHeaderDataBufferType     = 26,
     VAEncMiscParameterBufferType	= 27,
     VAEncMacroblockParameterBufferType	= 28,
+    VAEncMacroblockMapBufferType        = 29,
 /* Following are video processing buffer types */
     /**
      * \brief Video processing pipeline parameter buffer.
@@ -918,6 +951,7 @@ typedef enum
     VAEncMiscParameterTypeMaxFrameSize  = 4,
     /** \brief Buffer type used for HRD parameters. */
     VAEncMiscParameterTypeHRD           = 5,
+    VAEncMiscParameterTypeQualityLevel  = 6,
 } VAEncMiscParameterType;
 
 /** \brief Packed header type. */
@@ -1050,6 +1084,24 @@ typedef struct _VAEncMiscParameterBufferMaxFrameSize {
 } VAEncMiscParameterBufferMaxFrameSize;
 
 /**
+ * \brief Encoding quality level.
+ *
+ * The encoding quality could be set through this structure, if the implementation  
+ * supports multiple quality levels. The quality level set through this structure is 
+ * persistent over the entire coded sequence, or until a new structure is being sent.
+ * The quality level range can be queried through the VAConfigAttribEncQualityRange 
+ * attribute. A lower value means higher quality, and a value of 1 represents the highest 
+ * quality. The quality level setting is used as a trade-off between quality and speed/power 
+ * consumption, with higher quality corresponds to lower speed and higher power consumption. 
+ */
+typedef struct _VAEncMiscParameterBufferQualityLevel {
+    /** \brief Encoding quality level setting. When set to 0, default quality
+     * level is used.
+     */
+    unsigned int                quality_level;
+} VAEncMiscParameterBufferQualityLevel;
+
+/* 
  * There will be cases where the bitstream buffer will not have enough room to hold
  * the data for the entire slice, and the following flags will be used in the slice
  * parameter to signal to the server for the possible cases.
@@ -1850,6 +1902,108 @@ VAStatus vaDestroyBuffer (
     VADisplay dpy,
     VABufferID buffer_id
 );
+
+/** \brief VA buffer information */
+typedef struct {
+    /** \brief Buffer handle */
+    uintptr_t           handle;
+    /** \brief Buffer type (See \ref VABufferType). */
+    uint32_t            type;
+    /**
+     * \brief Buffer memory type (See \ref VASurfaceAttribMemoryType).
+     *
+     * On input to vaAcquireBufferHandle(), this field can serve as a hint
+     * to specify the set of memory types the caller is interested in.
+     * On successful return from vaAcquireBufferHandle(), the field is
+     * updated with the best matching memory type.
+     */
+    uint32_t            mem_type;
+    /** \brief Size of the underlying buffer. */
+    size_t              mem_size;
+} VABufferInfo;
+
+/**
+ * \brief Acquires buffer handle for external API usage
+ *
+ * Locks the VA buffer object \ref buf_id for external API usage like
+ * EGL or OpenCL (OCL). This function is a synchronization point. This
+ * means that any pending operation is guaranteed to be completed
+ * prior to returning from the function.
+ *
+ * If the referenced VA buffer object is the backing store of a VA
+ * surface, then this function acts as if vaSyncSurface() on the
+ * parent surface was called first.
+ *
+ * The \ref VABufferInfo argument shall be zero'ed on input. On
+ * successful output, the data structure is filled in with all the
+ * necessary buffer level implementation details like handle, type,
+ * memory type and memory size.
+ *
+ * Note: the external API implementation, or the application, can
+ * express the memory types it is interested in by filling in the \ref
+ * mem_type field accordingly. On successful output, the memory type
+ * that fits best the request and that was used is updated in the \ref
+ * VABufferInfo data structure. If none of the supplied memory types
+ * is supported, then a \ref VA_STATUS_ERROR_UNSUPPORTED_MEMORY_TYPE
+ * error is returned.
+ *
+ * The \ref VABufferInfo data is valid until vaReleaseBufferHandle()
+ * is called. Besides, no additional operation is allowed on any of
+ * the buffer parent object until vaReleaseBufferHandle() is called.
+ * e.g. decoding into a VA surface backed with the supplied VA buffer
+ * object \ref buf_id would fail with a \ref VA_STATUS_ERROR_SURFACE_BUSY
+ * error.
+ *
+ * Possible errors:
+ * - \ref VA_STATUS_ERROR_UNIMPLEMENTED: the VA driver implementation
+ *   does not support this interface
+ * - \ref VA_STATUS_ERROR_INVALID_DISPLAY: an invalid display was supplied
+ * - \ref VA_STATUS_ERROR_INVALID_BUFFER: an invalid buffer was supplied
+ * - \ref VA_STATUS_ERROR_UNSUPPORTED_BUFFERTYPE: the implementation
+ *   does not support exporting buffers of the specified type
+ * - \ref VA_STATUS_ERROR_UNSUPPORTED_MEMORY_TYPE: none of the requested
+ *   memory types in \ref VABufferInfo.mem_type was supported
+ *
+ * @param[in] dpy               the VA display
+ * @param[in] buf_id            the VA buffer
+ * @param[in,out] buf_info      the associated VA buffer information
+ * @return VA_STATUS_SUCCESS if successful
+ */
+VAStatus
+vaAcquireBufferHandle(VADisplay dpy, VABufferID buf_id, VABufferInfo *buf_info);
+
+/**
+ * \brief Releases buffer after usage from external API
+ *
+ * Unlocks the VA buffer object \ref buf_id from external API usage like
+ * EGL or OpenCL (OCL). This function is a synchronization point. This
+ * means that any pending operation is guaranteed to be completed
+ * prior to returning from the function.
+ *
+ * The \ref VABufferInfo argument shall point to the original data
+ * structure that was obtained from vaAcquireBufferHandle(), unaltered.
+ * This is necessary so that the VA driver implementation could
+ * deallocate any resources that were needed.
+ *
+ * In any case, returning from this function invalidates any contents
+ * in \ref VABufferInfo. i.e. the underlyng buffer handle is no longer
+ * valid. Therefore, VA driver implementations are free to reset this
+ * data structure to safe defaults.
+ *
+ * Possible errors:
+ * - \ref VA_STATUS_ERROR_UNIMPLEMENTED: the VA driver implementation
+ *   does not support this interface
+ * - \ref VA_STATUS_ERROR_INVALID_DISPLAY: an invalid display was supplied
+ * - \ref VA_STATUS_ERROR_INVALID_BUFFER: an invalid buffer was supplied
+ * - \ref VA_STATUS_ERROR_UNSUPPORTED_BUFFERTYPE: the implementation
+ *   does not support exporting buffers of the specified type
+ *
+ * @param[in] dpy               the VA display
+ * @param[in] buf_id            the VA buffer
+ * @return VA_STATUS_SUCCESS if successful
+ */
+VAStatus
+vaReleaseBufferHandle(VADisplay dpy, VABufferID buf_id);
 
 /*
 Render (Decode) Pictures
