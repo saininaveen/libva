@@ -481,7 +481,7 @@ static void va_TraceSurfaceAttributes(
             break;
         case VAGenericValueTypePointer:
             va_TraceMsg(trace_ctx, "\t\tvalue.value.p = %p\n", p->value.value.p);
-            if (type == VASurfaceAttribExternalBufferDescriptor) {
+            if ((p->type == VASurfaceAttribExternalBufferDescriptor) && p->value.value.p) {
                 VASurfaceAttribExternalBuffers *tmp = (VASurfaceAttribExternalBuffers *) p->value.value.p;
                 int j;
                 
@@ -499,7 +499,7 @@ static void va_TraceSurfaceAttributes(
                 va_TraceMsg(trace_ctx, "\t\t  num_buffers=0x%08x\n", tmp->num_buffers);
                 va_TraceMsg(trace_ctx, "\t\t  buffers=%p\n", tmp->buffers);
                 for (j = 0; j < tmp->num_buffers; j++) {
-                    va_TraceMsg(trace_ctx, "\t\t\tbuffers[%j]=%p\n", tmp->buffers[j]);
+                    va_TraceMsg(trace_ctx, "\t\t\tbuffers[%d]=%p\n", j, tmp->buffers[j]);
                 }
             }
             break;
@@ -2938,7 +2938,7 @@ void va_TraceRenderPicture(
 
         case VAProfileNone:
             for (j=0; j<num_elements; j++) {
-                va_TraceMsg(trace_ctx, "\telement[%d] = ", j);
+                va_TraceMsg(trace_ctx, "\telement[%d] =\n", j);
 
                 va_TraceNoneBuf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
             }
@@ -2946,7 +2946,7 @@ void va_TraceRenderPicture(
 
         case VAProfileVP8Version0_3:
             for (j=0; j<num_elements; j++) {
-                va_TraceMsg(trace_ctx, "\telement[%d] = ", j);
+                va_TraceMsg(trace_ctx, "\telement[%d] =\n", j);
 
                 va_TraceVP8Buf(dpy, context, buffers[i], type, size, num_elements, pbuf + size*j);
             }
@@ -2983,7 +2983,7 @@ void va_TraceEndPicture(
 
     /* trace encode source surface, can do it before HW completes rendering */
     if ((encode && (trace_flag & VA_TRACE_FLAG_SURFACE_ENCODE))||
-	    (jpeg && (trace_flag & VA_TRACE_FLAG_SURFACE_JPEG)))
+        (jpeg && (trace_flag & VA_TRACE_FLAG_SURFACE_JPEG)))
         va_TraceSurface(dpy);
     
     /* trace decoded surface, do it after HW completes rendering */
