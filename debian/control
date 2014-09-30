@@ -211,6 +211,8 @@ Depends:
  ${misc:Depends},
  i965-va-driver [any-amd64 any-i386],
  vdpau-va-driver
+Suggests:
+ xvba-va-driver [amd64 i386]
 Description: Video Acceleration (VA) API -- driver metapackage
  This package depends on the full suite of drivers for the Video Acceleration
  API (VA API). It does not provide any drivers itself, and may be removed if
