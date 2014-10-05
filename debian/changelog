@@ -15,7 +15,7 @@ libva (1.4.0-1) experimental; urgency=medium
     - Bump Standards version. No changes required.
     - Add xvba-driver to va-driver-all's Suggests.
   * debian/use-after-free.patch: Removed, no longer needed.
-  * debian/copyright: Upstea copyright years.
+  * debian/copyright: Update copyright years.
   * debian/rules: Install NEWS as upstream changelog.
 
  -- Sebastian Ramacher <sramacher@debian.org>  Tue, 30 Sep 2014 16:14:39 +0200
