@@ -2,7 +2,7 @@
 
 DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
-confflags = --disable-silent-rules
+confflags = --disable-silent-rules --enable-static
 ifeq (,$(findstring linux,$(DEB_HOST_ARCH_OS)))
 # wayland is only available on linux-any
 confflags += --disable-wayland
