@@ -32,9 +32,10 @@ Depends:
  libva-egl1 (= ${binary:Version}),
  libva-glx1 (= ${binary:Version}),
  libva-tpi1 (= ${binary:Version}),
- libva-x11-1 (= ${binary:Version}),
  libva-wayland1 (= ${binary:Version}) [linux-any],
+ libva-x11-1 (= ${binary:Version}),
  libva1 (= ${binary:Version}),
+ libwayland-dev (>= 1.0.0) [linux-any],
  ${misc:Depends}
 Description: Video Acceleration (VA) API for Linux -- development files
  Video Acceleration API (VA API) is a library ("libVA") and API specification
