@@ -1,3 +1,4 @@
 usr/include
 usr/lib/*/libva*.so
+usr/lib/*/libva*.a
 usr/lib/*/pkgconfig
