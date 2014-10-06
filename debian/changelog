@@ -1,8 +1,11 @@
-libva (1.4.0-3) UNRELEASED; urgency=medium
+libva (1.4.0-3) unstable; urgency=medium
 
-  * 
+  * debian/control: Depend on libwayland-client to satisfy Requires from
+    libva-wayland.pc.
+  * Install static libraries. (Closes: #763915)
+    debian/rules: Build with --enable-static.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Mon, 06 Oct 2014 02:07:51 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Tue, 07 Oct 2014 00:36:11 +0200
 
 libva (1.4.0-2) unstable; urgency=medium
 
