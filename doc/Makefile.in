@@ -292,8 +292,13 @@ EXTRA_DIST = \
 
 VA_HEADER_DIR = $(top_srcdir)/va
 VA_HEADER_FILES = \
+	$(VA_HEADER_DIR)/va.h		\
+	$(VA_HEADER_DIR)/va_enc_h264.h	\
+	$(VA_HEADER_DIR)/va_vpp.h	\
 	$(NULL)
 
+VA_HTML_FOOTER = va_footer.html
+VA_HTML_FRAGMENTS = $(VA_HTML_FOOTER)
 
 # Extra clean files so that maintainer-clean removes *everything*
 MAINTAINERCLEANFILES = Makefile.in
@@ -408,11 +413,11 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
-@ENABLE_DOCS_FALSE@uninstall-local:
 @ENABLE_DOCS_FALSE@install-html-local:
+@ENABLE_DOCS_FALSE@uninstall-local:
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-local mostlyclean-am
+clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -479,7 +484,7 @@ uninstall-am: uninstall-local
 .MAKE: install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	clean-local cscopelist-am ctags-am distclean distclean-generic \
+	cscopelist-am ctags-am distclean distclean-generic \
 	distclean-libtool distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am \
 	install-data-local install-dvi install-dvi-am install-exec \
@@ -497,7 +502,8 @@ install-data-local: install-html
 
 export VA_HEADER_DIR
 export VA_HEADER_FILES
-html-out/index.html: Doxyfile $(VA_HEADER_FILES)
+export VA_HTML_FOOTER
+html-out/index.html: Doxyfile $(VA_HEADER_FILES) $(VA_HTML_FRAGMENTS)
 	$(DOXYGEN) $<
 
 @ENABLE_DOCS_TRUE@html: html-out/index.html
@@ -513,9 +519,6 @@ html-out/index.html: Doxyfile $(VA_HEADER_FILES)
 @ENABLE_DOCS_TRUE@	done
 @ENABLE_DOCS_TRUE@uninstall-local:
 @ENABLE_DOCS_TRUE@	rm -rf $(DESTDIR)$(docdir)/html
-
-clean-local:
-	rm -rf html-out
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
