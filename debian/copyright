@@ -104,6 +104,7 @@ License: other
 Files: debian/*
 Copyright: 2007, Waldo Bastian <waldo.bastian@intel.com>
            2010, Andres Mejia <mcitadel@gmail.com>
+           2013-2014, Sebastian Ramacher <sramacher@debian.org>
 License: GPL-2+
  This file is free software; you can redistribute it and/or modify it
  under the terms of the GNU General Public License as published by
@@ -122,6 +123,10 @@ License: GPL-2+
  .
  On Debian systems, the full text of the GNU General Public License
  version 2 can be found in the file `/usr/share/common-licenses/GPL-2'.
+
+Files: debian/dh/*
+Copyright: 2014, Sebastian Ramacher <sramacher@debian.org>
+License: Expat
 
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining

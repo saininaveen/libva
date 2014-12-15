@@ -17,7 +17,8 @@ Build-Depends:
  libx11-dev,
  libxext-dev,
  libxfixes-dev,
- pkg-config
+ pkg-config,
+ perl
 Standards-Version: 3.9.6
 Homepage: http://www.freedesktop.org/wiki/Software/vaapi
 Vcs-Git: git://anonscm.debian.org/pkg-multimedia/libva.git
@@ -36,7 +37,8 @@ Depends:
  libva-x11-1 (= ${binary:Version}),
  libva1 (= ${binary:Version}),
  libwayland-dev (>= 1.0.0) [linux-any],
- ${misc:Depends}
+ ${misc:Depends},
+ libset-scalar-perl
 Description: Video Acceleration (VA) API for Linux -- development files
  Video Acceleration API (VA API) is a library ("libVA") and API specification
  which enables and provides access to graphics hardware (GPU) acceleration for
@@ -60,6 +62,12 @@ Recommends:
  va-driver-all | va-driver
 Breaks:
  vlc-nox (<< 1.1.5-3)
+Provides:
+ libva-driver-abi-0.32,
+ libva-driver-abi-0.33,
+ libva-driver-abi-0.34,
+ libva-driver-abi-0.35,
+ libva-driver-abi-0.36
 Description: Video Acceleration (VA) API for Linux -- runtime
  Video Acceleration API (VA API) is a library ("libVA") and API specification
  which enables and provides access to graphics hardware (GPU) acceleration for

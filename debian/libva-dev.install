@@ -2,3 +2,5 @@ usr/include
 usr/lib/*/libva*.so
 usr/lib/*/libva*.a
 usr/lib/*/pkgconfig
+debian/dh/dh_libva /usr/bin
+debian/dh/libva.pm /usr/share/perl5/Debian/Debhelper/Sequence

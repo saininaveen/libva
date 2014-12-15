@@ -14,6 +14,10 @@ endif
 override_dh_auto_configure:
 	dh_auto_configure -- $(confflags)
 
+override_dh_auto_build:
+	dh_auto_build
+	cd debian/dh/ && pod2man -c Debhelper -r '' dh_libva dh_libva.1
+
 override_dh_makeshlibs:
 	dh_makeshlibs -Xdummy_drv_video.so
 
