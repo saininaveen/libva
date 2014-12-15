@@ -1,3 +1,9 @@
+libva (1.5.0~pre1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 15 Dec 2014 18:11:44 +0100
+
 libva (1.4.1-1) unstable; urgency=medium
 
   * New upstream release.
