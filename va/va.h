@@ -292,7 +292,9 @@ typedef enum
     VAProfileH264ConstrainedBaseline    = 13,
     VAProfileVP8Version0_3              = 14,
     VAProfileH264MultiviewHigh          = 15,
-    VAProfileH264StereoHigh             = 16
+    VAProfileH264StereoHigh             = 16,
+    VAProfileHEVCMain                   = 17,
+    VAProfileHEVCMain10                 = 18
 } VAProfile;
 
 /**
@@ -390,6 +392,14 @@ typedef enum
      */
     VAConfigAttribEncMacroblockInfo     = 16,
     /**
+     * \brief JPEG encoding attribute. Read-only.
+     *
+     * This attribute exposes a number of capabilities of the underlying
+     * JPEG implementation. The attribute value is partitioned into fields as defined in the 
+     * VAConfigAttribValEncJPEG union.
+     */
+    VAConfigAttribEncJPEG             = 20,
+    /**
      * \brief Encoding quality range attribute. Read-only.
      *
      * This attribute conveys whether the driver supports different quality level settings
@@ -480,6 +490,25 @@ typedef struct _VAConfigAttrib {
 /** \brief Driver supports an arbitrary number of rows per slice. */
 #define VA_ENC_SLICE_STRUCTURE_ARBITRARY_MACROBLOCKS    0x00000002
 /**@}*/
+
+/** \brief Attribute value for VAConfigAttribEncJPEG */
+typedef union _VAConfigAttribValEncJPEG {
+    struct {
+        /** \brief set to 1 for arithmatic coding. */
+        unsigned int arithmatic_coding_mode : 1;
+        /** \brief set to 1 for progressive dct. */
+        unsigned int progressive_dct_mode : 1;
+        /** \brief set to 1 for non-interleaved. */
+        unsigned int non_interleaved_mode : 1;
+        /** \brief set to 1 for differential. */
+        unsigned int differential_mode : 1;
+        unsigned int max_num_components : 3;
+        unsigned int max_num_scans : 4;
+        unsigned int max_num_huffman_tables : 3;
+        unsigned int max_num_quantization_tables : 3;
+    } bits;
+    unsigned int value;
+} VAConfigAttribValEncJPEG;
 
 /**
  * if an attribute is not applicable for a given
@@ -1121,26 +1150,6 @@ typedef struct _VASliceParameterBufferBase
     unsigned int slice_data_offset;	/* the offset to the first byte of slice data */
     unsigned int slice_data_flag;	/* see VA_SLICE_DATA_FLAG_XXX definitions */
 } VASliceParameterBufferBase;
-
-
-/****************************
- * JEPG data structure
- ***************************/
-typedef struct _VAQMatrixBufferJPEG
-{
-    int load_lum_quantiser_matrix;
-    int load_chroma_quantiser_matrix;
-    unsigned char lum_quantiser_matrix[64];
-    unsigned char chroma_quantiser_matrix[64];
-} VAQMatrixBufferJPEG;
-
-typedef struct _VAEncPictureParameterBufferJPEG
-{
-    VASurfaceID reconstructed_picture;
-    unsigned short picture_width;
-    unsigned short picture_height;
-    VABufferID coded_buf;
-} VAEncPictureParameterBufferJPEG;
 
 #include <va/va_dec_jpeg.h>
 
@@ -2656,6 +2665,72 @@ VAStatus vaSetDisplayAttributes (
     VADisplayAttribute *attr_list,
     int num_attributes
 );
+
+/****************************
+ * HEVC data structures
+ ****************************/
+/** 
+ * \brief Description of picture properties of those in DPB surfaces.
+ *
+ * If only progressive scan is supported, each surface contains one whole 
+ * frame picture.
+ * Otherwise, each surface contains two fields of whole picture.
+ * In this case, two entries of ReferenceFrames[] may share same picture_id
+ * value.
+ */
+typedef struct _VAPictureHEVC
+{
+    /** \brief reconstructed picture buffer surface index 
+     * invalid when taking value VA_INVALID_SURFACE.
+     */
+    VASurfaceID             picture_id;
+    /** \brief picture order count. 
+     * in HEVC, POCs for top and bottom fields of same picture should
+     * take different values.
+     */
+    int32_t                 pic_order_cnt;
+    /* described below */
+    uint32_t                flags;
+} VAPictureHEVC;
+
+/* flags in VAPictureHEVC could be OR of the following */
+#define VA_PICTURE_HEVC_INVALID                 0x00000001
+/** \brief indication of interlace scan picture. 
+ * should take same value for all the pictures in sequence.
+ */ 
+#define VA_PICTURE_HEVC_FIELD_PIC               0x00000002
+/** \brief polarity of the field picture.
+ * top field takes even lines of buffer surface.
+ * bottom field takes odd lines of buffer surface.
+ */
+#define VA_PICTURE_HEVC_BOTTOM_FIELD            0x00000004
+/** \brief Long term reference picture */
+#define VA_PICTURE_HEVC_LONG_TERM_REFERENCE     0x00000008
+/**
+ * VA_PICTURE_HEVC_RPS_ST_CURR_BEFORE, VA_PICTURE_HEVC_RPS_ST_CURR_AFTER
+ * and VA_PICTURE_HEVC_RPS_LT_CURR of any picture in ReferenceFrames[] should 
+ * be exclusive. No more than one of them can be set for any picture.
+ * Sum of NumPocStCurrBefore, NumPocStCurrAfter and NumPocLtCurr
+ * equals NumPocTotalCurr, which should be equal to or smaller than 8.
+ * Application should provide valid values for both short format and long format.
+ * The pictures in DPB with any of these three flags turned on are referred by
+ * the current picture.
+ */
+/** \brief RefPicSetStCurrBefore of HEVC spec variable 
+ * Number of ReferenceFrames[] entries with this bit set equals 
+ * NumPocStCurrBefore.
+ */
+#define VA_PICTURE_HEVC_RPS_ST_CURR_BEFORE      0x00000010
+/** \brief RefPicSetStCurrAfter of HEVC spec variable
+ * Number of ReferenceFrames[] entries with this bit set equals 
+ * NumPocStCurrAfter.
+ */
+#define VA_PICTURE_HEVC_RPS_ST_CURR_AFTER       0x00000020
+/** \brief RefPicSetLtCurr of HEVC spec variable
+ * Number of ReferenceFrames[] entries with this bit set equals 
+ * NumPocLtCurr.
+ */
+#define VA_PICTURE_HEVC_RPS_LT_CURR             0x00000040
 
 /**@}*/
 
