@@ -1,8 +1,19 @@
-libva (1.5.0~pre1-1) UNRELEASED; urgency=medium
+libva (1.5.0~pre1-1) experimental; urgency=medium
 
+  [ Matteo F. Vescovi ]
+  * debian/control: Uploader e-mail address updated
+
+  [ Sebastian Ramacher ]
   * New upstream release.
+  * debian/patches: Refresh patches.
+  * Add support for driver ABI tracking. (LP: #1384100)
+    - debian/control: Add Provides: libva-driver-abi-* to libva1 to track the
+      supported driver ABI.
+    - debian/dh/*: Add dh_libva and a dh sequence so driver packages can
+      generate dependencies automatically.
+  * debian/rules: Build with -Wl,--as-needed.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Mon, 15 Dec 2014 18:11:44 +0100
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 15 Dec 2014 19:56:10 +0100
 
 libva (1.4.1-1) unstable; urgency=medium
 
