@@ -42,10 +42,12 @@ libva_source_h = \
 	va_backend_tpi.h	\
 	va_backend_vpp.h	\
 	va_compat.h		\
+	va_dec_hevc.h		\
 	va_dec_jpeg.h		\
 	va_dec_vp8.h		\
 	va_drmcommon.h		\
 	va_enc_h264.h		\
+	va_enc_jpeg.h		\
 	va_enc_vp8.h		\
 	va_enc_mpeg2.h		\
 	va_tpi.h		\
@@ -61,7 +63,7 @@ libva_source_h_priv = \
 
 libva_ldflags = \
 	$(LDADD) -no-undefined	\
-	-Wl,-version-script,libva.syms \
+	-Wl,-version-script,${srcdir}/libva.syms \
 	$(NULL)
 
 lib_LTLIBRARIES			= libva.la
