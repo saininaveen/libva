@@ -26,7 +26,7 @@
 
 =head1 NAME
 
-dh_libva - helps with packaging VA-API drivers
+dh_libva - helps with packaging VA API drivers
 
 =head1 SYNOPSIS
 
@@ -34,8 +34,8 @@ dh_libva [S<I<debhelper options>>] [B<-X>I<item>] [I<directory>...]
 
 =head1 DESCRIPTION
 
-B<dh_libva> is a debhelper program that generates dependencies for VA-API driver
-packages. It scans packages looking for VA-API drivers and adds the packages
+B<dh_libva> is a debhelper program that generates dependencies for VA API driver
+packages. It scans packages looking for VA API drivers and adds the packages
 providing the necessary ABI for the driver to the B<${misc:Depends}>
 substitution variable.
 
