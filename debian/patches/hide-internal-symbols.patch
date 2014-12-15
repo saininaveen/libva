@@ -1,299 +1,8 @@
 Description: Hide internal symbols
- This patch hides many internal symbols. It is based on the inital work by Emil
- Velikov that can be found in the thread starting at
- http://lists.freedesktop.org/archives/libva/2014-September/002687.html.
-Author: Emil Velikov <emil.l.velikov@gmail.com>,
- Sebastian Ramacher <sramacher@debian.org>
-Last-Update: 2014-09-30
+ This patch hides many internal symbols.
+Author: Sebastian Ramacher <sramacher@debian.org>
+Last-Update: 2014-12-15
 
---- a/va/glx/va_glx.c
-+++ b/va/glx/va_glx.c
-@@ -22,6 +22,7 @@
-  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  */
- 
-+#include "sysdeps.h"
- #include <stdlib.h>
- #include "va_glx_private.h"
- #include "va_glx_impl.h"
---- a/va/glx/va_glx_impl.c
-+++ b/va/glx/va_glx_impl.c
-@@ -23,6 +23,7 @@
-  */
- 
- #define _GNU_SOURCE 1
-+#include "sysdeps.h"
- #include "va_glx_private.h"
- #include "va_glx_impl.h"
- #include <stdio.h>
---- a/va/glx/va_glx_impl.h
-+++ b/va/glx/va_glx_impl.h
-@@ -31,7 +31,7 @@
-  * @param[in]  ctx        the VA driver context
-  * @return VA_STATUS_SUCCESS if successful
-  */
-+DLL_HIDDEN
- VAStatus va_glx_init_context(VADriverContextP ctx);
--    /* ATTRIBUTE_HIDDEN; */
- 
- #endif /* VA_GLX_IMPL_H */
---- a/va/va_fool.c
-+++ b/va/va_fool.c
-@@ -23,6 +23,7 @@
-  */
- 
- #define _GNU_SOURCE 1
-+#include "sysdeps.h"
- #include "va.h"
- #include "va_backend.h"
- #include "va_trace.h"
-@@ -60,7 +61,7 @@
- 
- 
- /* global settings */
--int fool_codec = 0;
-+DLL_HIDDEN int fool_codec = 0;
- int fool_postp  = 0;
- 
- #define FOOL_BUFID_MAGIC   0x12345600
---- a/va/va_trace.c
-+++ b/va/va_trace.c
-@@ -24,6 +24,7 @@
-  */
- 
- #define _GNU_SOURCE 1
-+#include "sysdeps.h"
- #include "va.h"
- #include "va_enc_h264.h"
- #include "va_backend.h"
-@@ -257,8 +258,7 @@
-     ((VADisplayContextP)dpy)->vatrace = NULL;
- }
- 
--
--void va_TraceMsg(struct trace_context *trace_ctx, const char *msg, ...)
-+static void va_TraceMsg(struct trace_context *trace_ctx, const char *msg, ...)
- {
-     va_list args;
- 
-@@ -279,7 +279,7 @@
- }
- 
- 
--void va_TraceSurface(VADisplay dpy)
-+static void va_TraceSurface(VADisplay dpy)
- {
-     unsigned int i, j;
-     unsigned int fourcc; /* following are output argument */
---- a/va/va_trace.h
-+++ b/va/va_trace.h
-@@ -50,19 +50,24 @@
-         trace_func(__VA_ARGS__);                \
-     }
- 
-+DLL_HIDDEN
- void va_TraceInit(VADisplay dpy);
-+DLL_HIDDEN
- void va_TraceEnd(VADisplay dpy);
- 
-+DLL_HIDDEN
- void va_TraceInitialize (
-     VADisplay dpy,
-     int *major_version,	 /* out */
-     int *minor_version 	 /* out */
- );
- 
-+DLL_HIDDEN
- void va_TraceTerminate (
-     VADisplay dpy
- );
- 
-+DLL_HIDDEN
- void va_TraceCreateConfig(
-     VADisplay dpy,
-     VAProfile profile, 
-@@ -72,6 +77,7 @@
-     VAConfigID *config_id /* out */
- );
- 
-+DLL_HIDDEN
- void va_TraceCreateSurfaces(
-     VADisplay dpy,
-     int width,
-@@ -83,12 +89,14 @@
-     unsigned int        num_attribs
- );
- 
-+DLL_HIDDEN
- void va_TraceDestroySurfaces(
-     VADisplay dpy,
-     VASurfaceID *surface_list,
-     int num_surfaces
- );
--    
-+
-+DLL_HIDDEN
- void va_TraceCreateContext(
-     VADisplay dpy,
-     VAConfigID config_id,
-@@ -100,6 +108,7 @@
-     VAContextID *context		/* out */
- );
- 
-+DLL_HIDDEN
- void va_TraceCreateBuffer (
-     VADisplay dpy,
-     VAContextID context,	/* in */
-@@ -109,12 +118,14 @@
-     void *data,			/* in */
-     VABufferID *buf_id		/* out */
- );
--    
-+
-+DLL_HIDDEN
- void va_TraceDestroyBuffer (
-     VADisplay dpy,
-     VABufferID buf_id    /* in */
- );
- 
-+DLL_HIDDEN
- void va_TraceMapBuffer (
-     VADisplay dpy,
-     VABufferID buf_id,	/* in */
-@@ -122,12 +133,14 @@
- );
- 
- 
-+DLL_HIDDEN
- void va_TraceBeginPicture(
-     VADisplay dpy,
-     VAContextID context,
-     VASurfaceID render_target
- );
- 
-+DLL_HIDDEN
- void va_TraceRenderPicture(
-     VADisplay dpy,
-     VAContextID context,
-@@ -135,17 +148,20 @@
-     int num_buffers
- );
- 
-+DLL_HIDDEN
- void va_TraceEndPicture(
-     VADisplay dpy,
-     VAContextID context,
-     int endpic_done
- );
- 
-+DLL_HIDDEN
- void va_TraceSyncSurface(
-     VADisplay dpy,
-     VASurfaceID render_target
- );
- 
-+DLL_HIDDEN
- void va_TraceQuerySurfaceAttributes(
-     VADisplay           dpy,
-     VAConfigID          config,
-@@ -153,12 +169,14 @@
-     unsigned int       *num_attribs
- );
- 
-+DLL_HIDDEN
- void va_TraceQuerySurfaceStatus(
-     VADisplay dpy,
-     VASurfaceID render_target,
-     VASurfaceStatus *status	/* out */
- );
- 
-+DLL_HIDDEN
- void va_TraceQuerySurfaceError(
- 	VADisplay dpy,
- 	VASurfaceID surface,
-@@ -167,23 +185,27 @@
- );
- 
- 
-+DLL_HIDDEN
- void va_TraceMaxNumDisplayAttributes (
-     VADisplay dpy,
-     int number
- );
- 
-+DLL_HIDDEN
- void va_TraceQueryDisplayAttributes (
-     VADisplay dpy,
-     VADisplayAttribute *attr_list,	/* out */
-     int *num_attributes			/* out */
- );
- 
-+DLL_HIDDEN
- void va_TraceGetDisplayAttributes (
-     VADisplay dpy,
-     VADisplayAttribute *attr_list,
-     int num_attributes
- );
- 
-+DLL_HIDDEN
- void va_TraceSetDisplayAttributes (
-     VADisplay dpy,
-     VADisplayAttribute *attr_list,
---- a/va/x11/dri2_util.c
-+++ b/va/x11/dri2_util.c
-@@ -161,7 +161,7 @@
-     return &dri2_drawable->buffers[dri2_drawable->front_index];
- }
- 
--void
-+static void
- dri2Close(VADriverContextP ctx)
- {
-     struct dri_state *dri_state = (struct dri_state *)ctx->drm_state;
---- a/va/x11/va_fglrx.c
-+++ b/va/x11/va_fglrx.c
-@@ -22,6 +22,7 @@
-  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-  */
- 
-+#include "sysdeps.h"
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
---- a/va/x11/va_fglrx.h
-+++ b/va/x11/va_fglrx.h
-@@ -27,6 +27,7 @@
- 
- #include <X11/Xlib.h>
- 
-+DLL_HIDDEN
- Bool VA_FGLRXGetClientDriverName( Display *dpy, int screen,
-     int *ddxDriverMajorVersion, int *ddxDriverMinorVersion,
-     int *ddxDriverPatchVersion, char **clientDriverName );
---- a/va/x11/va_nvctrl.c
-+++ b/va/x11/va_nvctrl.c
-@@ -22,6 +22,7 @@
-  */
- 
- #define _GNU_SOURCE 1
-+#include "sysdeps.h"
- #include <string.h>
- 
- #define NEED_REPLIES
---- a/va/x11/va_nvctrl.h
-+++ b/va/x11/va_nvctrl.h
-@@ -26,9 +26,11 @@
- 
- #include <X11/Xlib.h>
- 
-+DLL_HIDDEN
- Bool VA_NVCTRLQueryDirectRenderingCapable( Display *dpy, int screen,
-     Bool *isCapable );
- 
-+DLL_HIDDEN
- Bool VA_NVCTRLGetClientDriverName( Display *dpy, int screen,
-     int *ddxDriverMajorVersion, int *ddxDriverMinorVersion,
-     int *ddxDriverPatchVersion, char **clientDriverName );
 --- a/va/va_fool.h
 +++ b/va/va_fool.h
 @@ -27,6 +27,7 @@
@@ -381,7 +90,7 @@ Last-Update: 2014-09-30
  {
      char buf[512], *dynbuf;
      va_list args;
-@@ -1028,7 +1028,7 @@
+@@ -1029,7 +1029,7 @@
    return ctx->vtable->vaDestroyBuffer( ctx, buffer_id );
  }
  
@@ -390,7 +99,7 @@ Last-Update: 2014-09-30
      VADisplay dpy,
      VAContextID context,	/* in */
      VABufferID buf_id,		/* in */
-@@ -1611,7 +1611,7 @@
+@@ -1612,7 +1612,7 @@
    return va_status;
  }
  
@@ -399,7 +108,7 @@ Last-Update: 2014-09-30
      VASurfaceID surface,
      unsigned int *fourcc, /* following are output argument */
      unsigned int *luma_stride,
-@@ -1632,7 +1632,7 @@
+@@ -1633,7 +1633,7 @@
  }
  
  
@@ -408,3 +117,14 @@ Last-Update: 2014-09-30
      VASurfaceID surface
  )
  {
+--- a/va/va_fool.c
++++ b/va/va_fool.c
+@@ -61,7 +61,7 @@
+ 
+ 
+ /* global settings */
+-int fool_codec = 0;
++DLL_HIDDEN int fool_codec = 0;
+ int fool_postp  = 0;
+ 
+ #define FOOL_BUFID_MAGIC   0x12345600
