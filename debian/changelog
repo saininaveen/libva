@@ -1,3 +1,9 @@
+libva (1.5.1-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sat, 25 Apr 2015 10:33:58 +0200
+
 libva (1.5.1-1) experimental; urgency=medium
 
   * New upstream release.
