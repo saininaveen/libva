@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright 2014 Sebastian Ramacher <sramacher@debian.org>
+# Copyright 2014-2015 Sebastian Ramacher <sramacher@debian.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -99,7 +99,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
   }
 
   # Add substvar
-  addsubstvar($package, $dh{SUBSTVAR}, join('|', $abiver->elements));
+  addsubstvar($package, $dh{SUBSTVAR},
+    join('|', reverse sort $abiver->elements));
 }
 
 exit 0;
