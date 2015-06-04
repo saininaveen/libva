@@ -1,8 +1,12 @@
-libva (1.6.0~pre1-1) UNRELEASED; urgency=medium
+libva (1.6.0~pre1-1) experimental; urgency=medium
 
   * New upstream release.
+  * debian/libva1.symbols: Add new symbols.
+  * debian/copyright: Update copyright years.
+  * debian/dh/dh_libva: Sort driver ABI versions in reversed order.
+  * debian/control: Add Provides for new driver ABI version.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Thu, 04 Jun 2015 11:49:27 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 04 Jun 2015 12:20:11 +0200
 
 libva (1.5.1-2) unstable; urgency=medium
 
