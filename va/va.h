@@ -205,6 +205,7 @@ typedef int VAStatus;	/** Return status type from functions */
 #define VA_CLEAR_DRAWABLE       0x00000008
 
 /** Color space conversion flags for vaPutSurface() */
+#define VA_SRC_COLOR_MASK       0x000000f0
 #define VA_SRC_BT601            0x00000010
 #define VA_SRC_BT709            0x00000020
 #define VA_SRC_SMPTE_240        0x00000040
@@ -231,7 +232,14 @@ const char *vaErrorStr(VAStatus error_status);
 typedef void* VANativeDisplay;	/* window system dependent */
 
 int vaDisplayIsValid(VADisplay dpy);
-    
+
+/**
+ *  Set the override driver name instead of queried driver driver.
+ */
+VAStatus vaSetDriverName(VADisplay dpy,
+                         char *driver_name
+);
+
 /**
  * Initialize the library 
  */
@@ -294,7 +302,8 @@ typedef enum
     VAProfileH264MultiviewHigh          = 15,
     VAProfileH264StereoHigh             = 16,
     VAProfileHEVCMain                   = 17,
-    VAProfileHEVCMain10                 = 18
+    VAProfileHEVCMain10                 = 18,
+    VAProfileVP9Profile0                = 19
 } VAProfile;
 
 /**
@@ -321,6 +330,21 @@ typedef enum
     VAConfigAttribIntraResidual		= 3,
     VAConfigAttribEncryption		= 4,
     VAConfigAttribRateControl		= 5,
+
+    /** @name Attributes for decoding */
+    /**@{*/
+    /**
+     * \brief Slice Decoding mode. Read/write.
+     *
+     * This attribute determines what mode the driver supports for slice
+     * decoding, through vaGetConfigAttributes(); and what mode the user
+     * will be providing to the driver, through vaCreateConfig(), if the
+     * driver supports those. If this attribute is not set by the user then
+     * it is assumed that VA_DEC_SLICE_MODE_NORMAL mode is used.
+     *
+     * See \c VA_DEC_SLICE_MODE_xxx for the list of slice decoding modes.
+     */
+    VAConfigAttribDecSliceMode		= 6,
 
     /** @name Attributes for encoding */
     /**@{*/
@@ -408,6 +432,14 @@ typedef enum
      * that can be configured. e.g. a value of 2 means there are two distinct quality levels. 
      */
     VAConfigAttribEncQualityRange     = 21,
+    /**
+     * \brief Encoding skip frame attribute. Read-only.
+     *
+     * This attribute conveys whether the driver supports sending skip frame parameters 
+     * (VAEncMiscParameterTypeSkipFrame) to the encoder's rate control, when the user has 
+     * externally skipped frames. 
+     */
+    VAConfigAttribEncSkipFrame        = 24,
     /**@}*/
     VAConfigAttribTypeMax
 } VAConfigAttribType;
@@ -449,6 +481,14 @@ typedef struct _VAConfigAttrib {
 #define VA_RC_CQP                       0x00000010
 /** \brief Variable bitrate with peak rate higher than average bitrate. */
 #define VA_RC_VBR_CONSTRAINED           0x00000020
+/**@}*/
+
+/** @name Attribute values for VAConfigAttribDecSliceMode */
+/**@{*/
+/** \brief Driver supports normal mode for slice decoding */
+#define VA_DEC_SLICE_MODE_NORMAL       0x00000001
+/** \brief Driver supports base mode for slice decoding */
+#define VA_DEC_SLICE_MODE_BASE         0x00000002
 /**@}*/
 
 /** @name Attribute values for VAConfigAttribEncPackedHeaders */
@@ -981,6 +1021,9 @@ typedef enum
     /** \brief Buffer type used for HRD parameters. */
     VAEncMiscParameterTypeHRD           = 5,
     VAEncMiscParameterTypeQualityLevel  = 6,
+    /** \brief Buffer type used for sending skip frame parameters to the encoder's
+      * rate control, when the user has externally skipped frames. */
+    VAEncMiscParameterTypeSkipFrame     = 9
 } VAEncMiscParameterType;
 
 /** \brief Packed header type. */
@@ -1130,6 +1173,30 @@ typedef struct _VAEncMiscParameterBufferQualityLevel {
     unsigned int                quality_level;
 } VAEncMiscParameterBufferQualityLevel;
 
+/**
+ * \brief Encoding skip frame.
+ *
+ * The application may choose to skip frames externally to the encoder (e.g. drop completely or 
+ * code as all skip's). For rate control purposes the encoder will need to know the size and number 
+ * of skipped frames.  Skip frame(s) indicated through this structure is applicable only to the 
+ * current frame.  It is allowed for the application to still send in packed headers for the driver to 
+ * pack, although no frame will be encoded (e.g. for HW to encrypt the frame).  
+ */
+typedef struct _VAEncMiscParameterSkipFrame {
+    /** \brief Indicates skip frames as below.
+      * 0: Encode as normal, no skip.
+      * 1: One or more frames were skipped prior to the current frame, encode the current frame as normal.  
+      * 2: The current frame is to be skipped, do not encode it but pack/encrypt the packed header contents
+      *    (all except VAEncPackedHeaderSlice) which could contain actual frame contents (e.g. pack the frame 
+      *    in VAEncPackedHeaderPicture).  */
+    unsigned char               skip_frame_flag;
+    /** \brief The number of frames skipped prior to the current frame.  Valid when skip_frame_flag = 1. */
+    unsigned char               num_skip_frames;
+    /** \brief When skip_frame_flag = 1, the size of the skipped frames in bits.   When skip_frame_flag = 2, 
+      * the size of the current skipped frame that is to be packed/encrypted in bits. */
+    unsigned int                size_skip_frames;
+} VAEncMiscParameterSkipFrame;
+
 /* 
  * There will be cases where the bitstream buffer will not have enough room to hold
  * the data for the entire slice, and the following flags will be used in the slice
@@ -1151,7 +1218,44 @@ typedef struct _VASliceParameterBufferBase
     unsigned int slice_data_flag;	/* see VA_SLICE_DATA_FLAG_XXX definitions */
 } VASliceParameterBufferBase;
 
-#include <va/va_dec_jpeg.h>
+/**********************************
+ * JPEG common  data structures
+ **********************************/
+/**
+ * \brief Huffman table for JPEG decoding.
+ *
+ * This structure holds the complete Huffman tables. This is an
+ * aggregation of all Huffman table (DHT) segments maintained by the
+ * application. i.e. up to 2 Huffman tables are stored in there for
+ * baseline profile.
+ *
+ * The #load_huffman_table array can be used as a hint to notify the
+ * VA driver implementation about which table(s) actually changed
+ * since the last submission of this buffer.
+ */
+typedef struct _VAHuffmanTableBufferJPEGBaseline {
+    /** \brief Specifies which #huffman_table is valid. */
+    unsigned char       load_huffman_table[2];
+    /** \brief Huffman tables indexed by table identifier (Th). */
+    struct {
+        /** @name DC table (up to 12 categories) */
+        /**@{*/
+        /** \brief Number of Huffman codes of length i + 1 (Li). */
+        unsigned char   num_dc_codes[16];
+        /** \brief Value associated with each Huffman code (Vij). */
+        unsigned char   dc_values[12];
+        /**@}*/
+        /** @name AC table (2 special codes + up to 16 * 10 codes) */
+        /**@{*/
+        /** \brief Number of Huffman codes of length i + 1 (Li). */
+        unsigned char   num_ac_codes[16];
+        /** \brief Value associated with each Huffman code (Vij). */
+        unsigned char   ac_values[162];
+        /** \brief Padding to 4-byte boundaries. Must be set to zero. */
+        unsigned char   pad[2];
+        /**@}*/
+    }                   huffman_table[2];
+} VAHuffmanTableBufferJPEGBaseline;
 
 /****************************
  * MPEG-2 data structures
@@ -2731,6 +2835,17 @@ typedef struct _VAPictureHEVC
  * NumPocLtCurr.
  */
 #define VA_PICTURE_HEVC_RPS_LT_CURR             0x00000040
+
+#include <va/va_dec_hevc.h>
+#include <va/va_dec_jpeg.h>
+#include <va/va_dec_vp8.h>
+#include <va/va_dec_vp9.h>
+#include <va/va_enc_hevc.h>
+#include <va/va_enc_h264.h>
+#include <va/va_enc_jpeg.h>
+#include <va/va_enc_mpeg2.h>
+#include <va/va_enc_vp8.h>
+#include <va/va_vpp.h>
 
 /**@}*/
 
