@@ -1,8 +1,8 @@
-libva (1.6.1-1) UNRELEASED; urgency=medium
+libva (1.6.1-1) unstable; urgency=medium
 
   * New upstream release.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Thu, 10 Sep 2015 22:37:49 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 10 Sep 2015 22:39:23 +0200
 
 libva (1.6.0-1) unstable; urgency=medium
 
