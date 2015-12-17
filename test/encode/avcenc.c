@@ -96,7 +96,6 @@ static int ip_period = 1;
 
 
 static  unsigned int MaxFrameNum = (1<<12);
-static  unsigned int MaxPicOrderCntLsb = (1<<8);
 static  unsigned int Log2MaxFrameNum = 12;
 static  unsigned int Log2MaxPicOrderCntLsb = 8;
 
@@ -470,38 +469,6 @@ static int update_RefPicList()
     return 0;
 }
 
-static int calc_poc(int pic_order_cnt_lsb)
-{
-    static int PicOrderCntMsb_ref = 0, pic_order_cnt_lsb_ref = 0;
-    int prevPicOrderCntMsb, prevPicOrderCntLsb;
-    int PicOrderCntMsb, TopFieldOrderCnt;
-
-    if (current_frame_type == FRAME_IDR)
-        prevPicOrderCntMsb = prevPicOrderCntLsb = 0;
-    else {
-        prevPicOrderCntMsb = PicOrderCntMsb_ref;
-        prevPicOrderCntLsb = pic_order_cnt_lsb_ref;
-    }
-
-    if ((pic_order_cnt_lsb < prevPicOrderCntLsb) &&
-        ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= (int)(MaxPicOrderCntLsb / 2)))
-        PicOrderCntMsb = prevPicOrderCntMsb + MaxPicOrderCntLsb;
-    else if ((pic_order_cnt_lsb > prevPicOrderCntLsb) &&
-             ((pic_order_cnt_lsb - prevPicOrderCntLsb) > (int)(MaxPicOrderCntLsb / 2)))
-        PicOrderCntMsb = prevPicOrderCntMsb - MaxPicOrderCntLsb;
-    else
-        PicOrderCntMsb = prevPicOrderCntMsb;
-
-    TopFieldOrderCnt = PicOrderCntMsb + pic_order_cnt_lsb;
-
-    if (current_frame_type != SLICE_TYPE_B) {
-        PicOrderCntMsb_ref = PicOrderCntMsb;
-        pic_order_cnt_lsb_ref = pic_order_cnt_lsb;
-    }
-
-    return TopFieldOrderCnt;
-}
-
 static void avcenc_update_picture_parameter(int slice_type, int is_idr)
 {
     VAEncPictureParameterBufferH264 *pic_param;
@@ -742,7 +709,7 @@ static int begin_picture(FILE *yuv_fp, int frame_num, int display_num, int slice
         fprintf(stderr, "FATAL error!!!\n");
         exit(1);
     }
-    
+
     pthread_join(avcenc_context.upload_thread_id, NULL);
 
     avcenc_context.upload_thread_value = -1;
@@ -754,12 +721,11 @@ static int begin_picture(FILE *yuv_fp, int frame_num, int display_num, int slice
 
     if (is_idr) {
         VAEncPackedHeaderParameterBuffer packed_header_param_buffer;
-        unsigned int length_in_bits, offset_in_bytes;
+        unsigned int length_in_bits;
         unsigned char *packed_seq_buffer = NULL, *packed_pic_buffer = NULL;
 
         assert(slice_type == SLICE_TYPE_I);
         length_in_bits = build_packed_seq_buffer(&packed_seq_buffer);
-        offset_in_bytes = 0;
         packed_header_param_buffer.type = VAEncPackedHeaderSequence;
         packed_header_param_buffer.bit_length = length_in_bits;
         packed_header_param_buffer.has_emulation_bytes = 0;
@@ -778,7 +744,6 @@ static int begin_picture(FILE *yuv_fp, int frame_num, int display_num, int slice
         CHECK_VASTATUS(va_status,"vaCreateBuffer");
 
         length_in_bits = build_packed_pic_buffer(&packed_pic_buffer);
-        offset_in_bytes = 0;
         packed_header_param_buffer.type = VAEncPackedHeaderPicture;
         packed_header_param_buffer.bit_length = length_in_bits;
         packed_header_param_buffer.has_emulation_bytes = 0;
@@ -1664,7 +1629,7 @@ encode_picture(FILE *yuv_fp, FILE *avc_fp,
             index = SID_INPUT_PICTURE_0;
         if ( next_display_num >= frame_number )
             next_display_num = frame_number - 1;
-        fseek(yuv_fp, frame_size * next_display_num, SEEK_SET);
+        fseeko(yuv_fp, (off_t)frame_size * next_display_num, SEEK_SET);
 
         avcenc_context.upload_thread_param.yuv_fp = yuv_fp;
         avcenc_context.upload_thread_param.surface_id = surface_ids[index];
@@ -1802,12 +1767,7 @@ static void avcenc_context_pic_param_init(VAEncPictureParameterBufferH264 *pic_p
 
 static void avcenc_context_sei_init()
 {
-	int init_cpb_size;
-	int target_bit_rate;
-
 	/* it comes for the bps defined in SPS */
-	target_bit_rate = avcenc_context.seq_param.bits_per_second;
-	init_cpb_size = (target_bit_rate * 8) >> 10;
 	avcenc_context.i_initial_cpb_removal_delay = 2 * 90000;
 	avcenc_context.i_initial_cpb_removal_delay_offset = 2 * 90000;
 
@@ -1946,8 +1906,8 @@ int main(int argc, char *argv[])
         printf("Can't open input YUV file\n");
         return -1;
     }
-    fseek(yuv_fp,0l, SEEK_END);
-    file_size = ftell(yuv_fp);
+    fseeko(yuv_fp, (off_t)0, SEEK_END);
+    file_size = ftello(yuv_fp);
     frame_size = picture_width * picture_height +  ((picture_width * picture_height) >> 1) ;
 
     if ( (file_size < frame_size) || (file_size % frame_size) ) {
@@ -1956,7 +1916,7 @@ int main(int argc, char *argv[])
         return -1;
     }
     frame_number = file_size / frame_size;
-    fseek(yuv_fp, 0l, SEEK_SET);
+    fseeko(yuv_fp, (off_t)0, SEEK_SET);
 
     avc_fp = fopen(argv[4], "wb");	
     if ( avc_fp == NULL) {

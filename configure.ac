@@ -28,7 +28,7 @@
 # - reset minor version to zero when major version is incremented
 m4_define([va_api_major_version], [0])
 m4_define([va_api_minor_version], [38])
-m4_define([va_api_micro_version], [0])
+m4_define([va_api_micro_version], [1])
 
 m4_define([va_api_version],
           [va_api_major_version.va_api_minor_version.va_api_micro_version])
@@ -42,7 +42,7 @@ m4_define([va_api_version],
 # - reset micro version to zero when VA-API major or minor version is changed
 m4_define([libva_major_version], [m4_eval(va_api_major_version + 1)])
 m4_define([libva_minor_version], [m4_eval(va_api_minor_version - 32)])
-m4_define([libva_micro_version], [1])
+m4_define([libva_micro_version], [2])
 m4_define([libva_pre_version],   [0])
 
 m4_define([libva_version],
@@ -273,15 +273,17 @@ if test "$enable_wayland" = "yes"; then
     PKG_CHECK_MODULES([WAYLAND], [wayland-client >= wayland_api_version],
         [USE_WAYLAND="yes"], [:])
     if test "$USE_WAYLAND" = "yes"; then
+
+        WAYLAND_PREFIX=`$PKG_CONFIG --variable=prefix wayland-client`
+        AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner],,
+                     [${WAYLAND_PREFIX}/bin$PATH_SEPARATOR$PATH])
+
         AC_DEFINE([HAVE_VA_WAYLAND], [1],
                   [Defined to 1 if VA/Wayland API is built])
     fi
 fi
-AM_CONDITIONAL(USE_WAYLAND, test "$USE_WAYLAND" = "yes")
 
-m4_ifdef([WAYLAND_SCANNER_RULES],
-    [WAYLAND_SCANNER_RULES(['$(top_builddir)/va/wayland/protocol'])],
-    [wayland_scanner_rules=""; AC_SUBST(wayland_scanner_rules)])
+AM_CONDITIONAL(USE_WAYLAND, test "$USE_WAYLAND" = "yes")
 
 pkgconfigdir=${libdir}/pkgconfig
 AC_SUBST(pkgconfigdir)
@@ -336,7 +338,6 @@ debian.upstream/libva-x11.install.in
     va/glx/Makefile
     va/va_version.h
     va/wayland/Makefile
-    va/wayland/protocol/Makefile
     va/x11/Makefile
 ])
 
