@@ -97,7 +97,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
   # Add substvar
   addsubstvar($package, $dh{SUBSTVAR},
-    join('|', reverse sort $abiver->elements));
+    join(' | ', reverse sort $abiver->elements));
 }
 
 exit 0;
