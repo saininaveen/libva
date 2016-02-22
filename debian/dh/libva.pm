@@ -25,6 +25,6 @@ use strict;
 
 use Debian::Debhelper::Dh_Lib;
 
-insert_after('dh_install', 'dh_libva');
+insert_after('dh_link', 'dh_libva');
 
 1;
