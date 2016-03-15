@@ -1,3 +1,9 @@
+libva (1.7.0-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 16 Mar 2016 00:27:15 +0100
+
 libva (1.6.2-2) unstable; urgency=medium
 
   * debian/control: Update Suggests on AMD VA driver.
