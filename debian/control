@@ -21,8 +21,8 @@ Build-Depends:
  perl
 Standards-Version: 3.9.7
 Homepage: http://www.freedesktop.org/wiki/Software/vaapi
-Vcs-Git: git://anonscm.debian.org/pkg-multimedia/libva.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/libva.git
+Vcs-Git: https://anonscm.debian.org/git/pkg-multimedia/libva.git
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-multimedia/libva.git
 
 Package: libva-dev
 Section: libdevel
