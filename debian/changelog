@@ -1,8 +1,14 @@
-libva (1.7.0-1) UNRELEASED; urgency=medium
+libva (1.7.0-1) unstable; urgency=medium
 
   * New upstream release.
+  * debian/control:
+    - Add new driver ABI to Provides.
+    - Drop obsolete Breaks.
+    - Bump Standards Version.
+    - Update Vcs-*.
+  * debian/copyright: Fix a path.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Wed, 16 Mar 2016 00:27:15 +0100
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 16 Mar 2016 00:31:21 +0100
 
 libva (1.6.2-2) unstable; urgency=medium
 
