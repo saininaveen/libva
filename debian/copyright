@@ -76,7 +76,7 @@ Files: test/decode/mpeg2vldemo.cpp
 Copyright: 2007-2008, Intel Corporation
 License: Expat
 
-Files: va/wayland/protocol/wayland-drm.xml
+Files: va/wayland/wayland-drm.xml
 Copyright: 2008-2011, Kristian Høgsberg
            2010-2011, Intel Corporation
 License: other
