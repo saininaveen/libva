@@ -1,3 +1,11 @@
+libva (1.7.0-2) unstable; urgency=medium
+
+  * debian/control:
+    - Add mesa-va-drivers as alternative to Depends of va-driver-all.
+    - Bump Standards-Versions.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 11 May 2016 17:32:06 +0200
+
 libva (1.7.0-1) unstable; urgency=medium
 
   * New upstream release.
