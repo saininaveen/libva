@@ -117,21 +117,21 @@ enum wl_drm_format {
 
 struct wl_drm_listener {
 	/**
-	 * device - device
-	 * @name: name
+	 * device - (none)
+	 * @name: (none)
 	 */
 	void (*device)(void *data,
 		       struct wl_drm *wl_drm,
 		       const char *name);
 	/**
-	 * format - format
-	 * @format: format
+	 * format - (none)
+	 * @format: (none)
 	 */
 	void (*format)(void *data,
 		       struct wl_drm *wl_drm,
 		       uint32_t format);
 	/**
-	 * authenticated - authenticated
+	 * authenticated - (none)
 	 */
 	void (*authenticated)(void *data,
 			      struct wl_drm *wl_drm);
@@ -179,13 +179,8 @@ wl_drm_create_buffer(struct wl_drm *wl_drm, uint32_t name, int32_t width, int32_
 {
 	struct wl_proxy *id;
 
-	id = wl_proxy_create((struct wl_proxy *) wl_drm,
-			     &wl_buffer_interface);
-	if (!id)
-		return NULL;
-
-	wl_proxy_marshal((struct wl_proxy *) wl_drm,
-			 WL_DRM_CREATE_BUFFER, id, name, width, height, stride, format);
+	id = wl_proxy_marshal_constructor((struct wl_proxy *) wl_drm,
+			 WL_DRM_CREATE_BUFFER, &wl_buffer_interface, NULL, name, width, height, stride, format);
 
 	return (struct wl_buffer *) id;
 }
@@ -195,13 +190,8 @@ wl_drm_create_planar_buffer(struct wl_drm *wl_drm, uint32_t name, int32_t width,
 {
 	struct wl_proxy *id;
 
-	id = wl_proxy_create((struct wl_proxy *) wl_drm,
-			     &wl_buffer_interface);
-	if (!id)
-		return NULL;
-
-	wl_proxy_marshal((struct wl_proxy *) wl_drm,
-			 WL_DRM_CREATE_PLANAR_BUFFER, id, name, width, height, format, offset0, stride0, offset1, stride1, offset2, stride2);
+	id = wl_proxy_marshal_constructor((struct wl_proxy *) wl_drm,
+			 WL_DRM_CREATE_PLANAR_BUFFER, &wl_buffer_interface, NULL, name, width, height, format, offset0, stride0, offset1, stride1, offset2, stride2);
 
 	return (struct wl_buffer *) id;
 }

@@ -92,12 +92,22 @@ static int frame_bit_rate = -1;
 static int frame_rate = 30;
 static int ip_period = 1;
 
+static VAEntrypoint select_entrypoint = VAEntrypointEncSlice;
+
 #define MAX_SLICES      32
 
 
 static  unsigned int MaxFrameNum = (1<<12);
 static  unsigned int Log2MaxFrameNum = 12;
 static  unsigned int Log2MaxPicOrderCntLsb = 8;
+
+static const struct option longopts[] = {
+    {"qp", required_argument, 0, 1},
+    {"fb", required_argument, 0, 2},
+    {"mode", required_argument, 0, 3},
+    {"low-power", no_argument, 0, 4},
+    { NULL, 0, NULL, 0}
+};
 
 static int
 build_packed_pic_buffer(unsigned char **header_buffer);
@@ -187,7 +197,7 @@ static void create_encode_pipe()
                              &num_entrypoints);
 
     for	(slice_entrypoint = 0; slice_entrypoint < num_entrypoints; slice_entrypoint++) {
-        if (entrypoints[slice_entrypoint] == VAEntrypointEncSlice)
+        if (entrypoints[slice_entrypoint] == select_entrypoint)
             break;
     }
 
@@ -199,7 +209,7 @@ static void create_encode_pipe()
     /* find out the format for the render target, and rate control mode */
     attrib[0].type = VAConfigAttribRTFormat;
     attrib[1].type = VAConfigAttribRateControl;
-    vaGetConfigAttributes(va_dpy, avcenc_context.profile, VAEntrypointEncSlice,
+    vaGetConfigAttributes(va_dpy, avcenc_context.profile, select_entrypoint,
                           &attrib[0], 2);
 
     if ((attrib[0].value & VA_RT_FORMAT_YUV420) == 0) {
@@ -216,7 +226,7 @@ static void create_encode_pipe()
     attrib[0].value = VA_RT_FORMAT_YUV420; /* set to desired RT format */
     attrib[1].value = avcenc_context.rate_control_method; /* set to desired RC mode */
 
-    va_status = vaCreateConfig(va_dpy, avcenc_context.profile, VAEntrypointEncSlice,
+    va_status = vaCreateConfig(va_dpy, avcenc_context.profile, select_entrypoint,
                                &attrib[0], 2,&avcenc_context.config_id);
     CHECK_VASTATUS(va_status, "vaCreateConfig");
 
@@ -1681,7 +1691,7 @@ encode_picture(FILE *yuv_fp, FILE *avc_fp,
 
 static void show_help()
 {
-    printf("Usage: avnenc <width> <height> <input_yuvfile> <output_avcfile> [qp=qpvalue|fb=framebitrate] [mode=0(I frames only)/1(I and P frames)/2(I, P and B frames)\n");
+    printf("Usage: avnenc <width> <height> <input_yuvfile> <output_avcfile> [--qp=qpvalue|--fb=framebitrate] [--mode=0(I frames only)/1(I and P frames)/2(I, P and B frames)] [--low-power]\n");
 }
 
 static void avcenc_context_seq_param_init(VAEncSequenceParameterBufferH264 *seq_param,
@@ -1853,8 +1863,7 @@ int main(int argc, char *argv[])
 
     va_init_display_args(&argc, argv);
 
-    //TODO may be we should using option analytics library
-    if(argc != 5 && argc != 6 && argc != 7) {
+    if(argc < 5) {
         show_help();
         return -1;
     }
@@ -1864,42 +1873,66 @@ int main(int argc, char *argv[])
     picture_width_in_mbs = (picture_width + 15) / 16;
     picture_height_in_mbs = (picture_height + 15) / 16;
 
-    if (argc == 6 || argc == 7) {
-        qp_value = -1;
-        sscanf(argv[5], "qp=%d", &qp_value);
-        if ( qp_value == -1 ) {
-            frame_bit_rate = -1;
-            sscanf(argv[5], "fb=%d", &frame_bit_rate);
-            if (  frame_bit_rate == -1 ) {
+    if (argc > 5) {
+        char o;
+
+        optind = 5;
+
+        while ((o = getopt_long_only(argc, argv, "", longopts, NULL)) != -1) {
+            switch (o) {
+            case 1:     // qp
+                frame_bit_rate = -1;
+                qp_value = atoi(optarg);
+
+                if (qp_value > 51)
+                    qp_value = 51;
+
+                if (qp_value < 0)
+                    qp_value = 0;
+
+                break;
+
+            case 2:     // fb
+                qp_value = -1;
+                frame_bit_rate = atoi(optarg);
+
+                if (frame_bit_rate <= 0) {
+                    show_help();
+
+                    return -1;
+                }
+
+                break;
+
+            case 3:     // mode
+                mode_value = atoi(optarg);
+
+                if (mode_value == 0)
+                    ip_period = 0;
+                else if (mode_value == 1)
+                    ip_period = 1;
+                else if (mode_value == 2)
+                    /* Hack mechanism before adding the parameter of B-frame number */
+                    ip_period = 2;
+                else {
+                    printf("mode_value = %d\n", mode_value);
+                    show_help();
+                    return -1;
+                }
+
+                break;
+
+            case 4:     // low-power mode
+                select_entrypoint = VAEntrypointEncSliceLP;
+                break;
+
+            default:
                 show_help();
                 return -1;
             }
-        } else if (qp_value > 51) {
-            qp_value = 51;
-        } else if (qp_value < 0) {
-            qp_value = 0;
         }
     } else
         qp_value = 28;                          //default const QP mode
-
-    if (argc == 7) {
-        sscanf(argv[6], "mode=%d", &mode_value);
-        if ( mode_value == 0 ) {
-		ip_period = 0;
-        }
-        else if ( mode_value == 1) {
-		ip_period = 1;
-        }
-        else if ( mode_value == 2 ) {
-		/* Hack mechanism before adding the parameter of B-frame number */
-		ip_period = 3;
-        }
-        else {
-                printf("mode_value=%d\n",mode_value);
-                show_help();
-                return -1;
-        }
-    }
 
     yuv_fp = fopen(argv[3],"rb");
     if ( yuv_fp == NULL){

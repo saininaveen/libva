@@ -117,7 +117,10 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/va_version.h.in $(top_srcdir)/depcomp \
 	$(am__libvainclude_HEADERS_DIST) $(noinst_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -259,7 +262,7 @@ am__libvainclude_HEADERS_DIST = va.h va_backend.h va_backend_tpi.h \
 	va_backend_vpp.h va_compat.h va_dec_hevc.h va_dec_jpeg.h \
 	va_dec_vp8.h va_dec_vp9.h va_drmcommon.h va_enc_hevc.h \
 	va_enc_h264.h va_enc_jpeg.h va_enc_vp8.h va_enc_mpeg2.h \
-	va_tpi.h va_version.h va_vpp.h va_x11.h
+	va_enc_vp9.h va_tpi.h va_version.h va_vpp.h va_x11.h
 HEADERS = $(libvainclude_HEADERS) $(noinst_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
@@ -486,8 +489,8 @@ libva_source_c = \
 libva_source_h = va.h va_backend.h va_backend_tpi.h va_backend_vpp.h \
 	va_compat.h va_dec_hevc.h va_dec_jpeg.h va_dec_vp8.h \
 	va_dec_vp9.h va_drmcommon.h va_enc_hevc.h va_enc_h264.h \
-	va_enc_jpeg.h va_enc_vp8.h va_enc_mpeg2.h va_tpi.h \
-	va_version.h va_vpp.h $(NULL) $(am__append_5)
+	va_enc_jpeg.h va_enc_vp8.h va_enc_mpeg2.h va_enc_vp9.h \
+	va_tpi.h va_version.h va_vpp.h $(NULL) $(am__append_5)
 libva_source_h_priv = \
 	sysdeps.h		\
 	va_fool.h		\
