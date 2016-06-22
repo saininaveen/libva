@@ -1,3 +1,9 @@
+libva (1.7.1-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 22 Jun 2016 08:48:35 +0200
+
 libva (1.7.0-2) unstable; urgency=medium
 
   * debian/control:
