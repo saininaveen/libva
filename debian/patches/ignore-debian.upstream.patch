@@ -4,8 +4,10 @@ Author: Sebastian Ramacher <sramacher@debian.org>
 Forwarded: not-needed
 Last-Update: 2016-07-08
 
---- libva-1.7.1.orig/configure.ac
-+++ libva-1.7.1/configure.ac
+Index: libva/configure.ac
+===================================================================
+--- libva.orig/configure.ac
++++ libva/configure.ac
 @@ -300,21 +300,6 @@ AC_DEFINE_UNQUOTED([VA_DRIVER_INIT_FUNC]
  
  AC_OUTPUT([
@@ -28,3 +30,65 @@ Last-Update: 2016-07-08
      doc/Makefile
      dummy_drv_video/Makefile
      pkgconfig/Makefile
+Index: libva/Makefile.am
+===================================================================
+--- libva.orig/Makefile.am
++++ libva/Makefile.am
+@@ -24,7 +24,7 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ 
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = va dummy_drv_video pkgconfig test debian.upstream doc
++SUBDIRS = va dummy_drv_video pkgconfig test doc
+ 
+ # Extra clean files so that maintainer-clean removes *everything*
+ MAINTAINERCLEANFILES = \
+@@ -33,15 +33,3 @@ MAINTAINERCLEANFILES = \
+ 	Makefile.in missing
+ 
+ DEB_BUILDDIR = debian.build
+-
+-deb:
+-	@[ -d debian ] || ln -s debian.upstream debian
+-	dpkg-buildpackage -rfakeroot -uc -us
+-
+-deb.upstream: dist
+-	-mkdir -p $(DEB_BUILDDIR)
+-	cd $(DEB_BUILDDIR)				&& \
+-	rm -rf $(PACKAGE)-$(VERSION)			&& \
+-	tar zxvf ../$(PACKAGE)-$(VERSION).tar.gz	&& \
+-	cd $(PACKAGE)-$(VERSION)			&& \
+-	$(MAKE) deb -f Makefile.am
+Index: libva/Makefile.in
+===================================================================
+--- libva.orig/Makefile.in
++++ libva/Makefile.in
+@@ -371,7 +371,7 @@ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ AUTOMAKE_OPTIONS = foreign
+-SUBDIRS = va dummy_drv_video pkgconfig test debian.upstream doc
++SUBDIRS = va dummy_drv_video pkgconfig test doc
+ 
+ # Extra clean files so that maintainer-clean removes *everything*
+ MAINTAINERCLEANFILES = \
+@@ -861,19 +861,6 @@ uninstall-am:
+ 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+ 	uninstall-am
+ 
+-
+-deb:
+-	@[ -d debian ] || ln -s debian.upstream debian
+-	dpkg-buildpackage -rfakeroot -uc -us
+-
+-deb.upstream: dist
+-	-mkdir -p $(DEB_BUILDDIR)
+-	cd $(DEB_BUILDDIR)				&& \
+-	rm -rf $(PACKAGE)-$(VERSION)			&& \
+-	tar zxvf ../$(PACKAGE)-$(VERSION).tar.gz	&& \
+-	cd $(PACKAGE)-$(VERSION)			&& \
+-	$(MAKE) deb -f Makefile.am
+-
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+ .NOEXPORT:
