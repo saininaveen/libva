@@ -10,7 +10,7 @@ libva (1.7.1-2) UNRELEASED; urgency=medium
 
   [ Nicholas D Steeves ]
   * debian/patches/ignore-debian.upstream.patch: Remove debian.upstream
-    from Makefile.am and Makefile.in
+    from Makefile.am
 
  -- Nicholas D Steeves <nsteeves@gmail.com>  Sat, 16 Jul 2016 21:09:06 -0400
 
