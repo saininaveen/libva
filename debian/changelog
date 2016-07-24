@@ -1,3 +1,9 @@
+libva (1.7.1-2~bpo8+1) jessie-backports; urgency=medium
+
+  * Rebuild for jessie-backports.
+
+ -- Nicholas D Steeves <nsteeves@gmail.com>  Sun, 24 Jul 2016 16:02:59 -0400
+
 libva (1.7.1-2) unstable; urgency=medium
 
   [ Sebastian Ramacher ]
