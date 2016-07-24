@@ -1,18 +1,21 @@
 libva (1.7.1-2) unstable; urgency=medium
 
-  * Team upload.
-
   [ Sebastian Ramacher ]
   * debian/patches/ignore-debian.upstream.patch:
     - Do not touch debian.upstream during build.
     - No longer clean files in debian.upstream.
   * debian/clean: Remove obsolete files.
+  * debian/*.symbols: Add Build-Depends-Package everywhere.
+  * debian/libva1.symbols: Update symbols for new enum values from 1.7.0 and
+    1.7.1.
+  * debian/rules: Ensure that binary packages depend on the same libva
+    upstream version.
 
   [ Nicholas D Steeves ]
   * debian/patches/ignore-debian.upstream.patch: prevent "make all" from
     traversing debian.upstream
 
- -- Nicholas D Steeves <nsteeves@gmail.com>  Fri, 22 Jul 2016 17:27:17 -0400
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 24 Jul 2016 16:18:15 +0200
 
 libva (1.7.1-1) unstable; urgency=medium
 
