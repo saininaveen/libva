@@ -1,4 +1,5 @@
 libva-x11.so.1 libva-x11-1 #MINVER#
+* Build-Depends-Package: libva-dev
  VA_DRI2Authenticate@Base 1.0.3
  VA_DRI2Connect@Base 1.0.3
  VA_DRI2CopyRegion@Base 1.0.3
