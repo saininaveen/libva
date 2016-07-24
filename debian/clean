@@ -1,1 +1,2 @@
 debian/dh/dh_libva.1
+debian/shlibs.local
