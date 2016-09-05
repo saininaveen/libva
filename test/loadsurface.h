@@ -72,10 +72,30 @@ static int YUV_blend_with_pic(int width, int height,
     
     if (width != 640 || height != 480) { /* need to scale the pic */
         pic_y = (unsigned char *)malloc(width * height);
-        pic_u = (unsigned char *)malloc(width * height/4);
-        pic_v = (unsigned char *)malloc(width * height/4);
+        if(pic_y == NULL) {
+           printf("Failed to allocate memory for pic_y\n");
+           return -1;
+        }
 
+        pic_u = (unsigned char *)malloc(width * height/4);
+        if(pic_u == NULL) {
+           printf("Failed to allocate memory for pic_u\n");
+           free(pic_y);
+           return -1;
+        }
+
+        pic_v = (unsigned char *)malloc(width * height/4);
+        if(pic_v == NULL) {
+           printf("Failed to allocate memory for pic_v\n");
+           free(pic_y);
+           free(pic_u);
+           return -1;
+        }
         allocated = 1;
+
+        memset(pic_y, 0, width * height);
+        memset(pic_u, 0, width * height /4);
+        memset(pic_v, 0, width * height /4);
         
         scale_2dimage(pic_y_old, 640, 480,
                       pic_y, width, height);
@@ -133,7 +153,6 @@ static int YUV_blend_with_pic(int width, int height,
         }
     }
         
-    
     if (allocated) {
         free(pic_y);
         free(pic_u);
@@ -352,9 +371,12 @@ static int upload_surface_yuv(VADisplay va_dpy, VASurfaceID surface_id,
                 v_ptr = src_U + row * (src_width/2);
                 u_ptr = src_V + row * (src_width/2);
             }
-            for(j = 0; j < src_width/2; j++) {
-                U_row[2*j] = u_ptr[j];
-                U_row[2*j+1] = v_ptr[j];
+            if ((src_fourcc == VA_FOURCC_IYUV) ||
+                (src_fourcc == VA_FOURCC_YV12)) {
+                for(j = 0; j < src_width/2; j++) {
+                    U_row[2*j] = u_ptr[j];
+                    U_row[2*j+1] = v_ptr[j];
+                }
             }
             break;
         case VA_FOURCC_IYUV:
@@ -442,9 +464,12 @@ static int download_surface_yuv(VADisplay va_dpy, VASurfaceID surface_id,
                 v_ptr = dst_U + row * (dst_width/2);
                 u_ptr = dst_V + row * (dst_width/2);
             }
-            for(j = 0; j < dst_width/2; j++) {
-                u_ptr[j] = U_row[2*j];
-                v_ptr[j] = U_row[2*j+1];
+            if ((dst_fourcc == VA_FOURCC_IYUV) ||
+                (dst_fourcc == VA_FOURCC_YV12)) {
+                for(j = 0; j < dst_width/2; j++) {
+                    u_ptr[j] = U_row[2*j];
+                    v_ptr[j] = U_row[2*j+1];
+                }
             }
             break;
         case VA_FOURCC_IYUV:
