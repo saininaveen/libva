@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <sys/select.h>
+#include <assert.h>
 #ifdef IN_LIBVA
 # include "va/wayland/va_wayland.h"
 #else
@@ -141,6 +142,7 @@ va_put_surface(
     struct wl_callback *callback;
     VAStatus va_status;
     struct wl_buffer *buffer;
+    int ret = 0;
 
     if (!wl_drawable)
         return VA_STATUS_ERROR_INVALID_SURFACE;
@@ -152,8 +154,8 @@ va_put_surface(
     /* Wait for the previous frame to complete redraw */
     if (wl_drawable->redraw_pending) {
         wl_display_flush(d->display);
-        while (wl_drawable->redraw_pending)
-            wl_display_dispatch(wl_drawable->display);
+        while (wl_drawable->redraw_pending && ret >=0)
+            ret = wl_display_dispatch(wl_drawable->display);
     }
 
     va_status = vaGetSurfaceBufferWl(va_dpy, va_surface, VA_FRAME_PICTURE, &buffer);
@@ -207,8 +209,10 @@ open_display(void)
         return NULL;
 
     d->display = wl_display_connect(NULL);
-    if (!d->display)
+    if (!d->display){
+        free(d);
         return NULL;
+    }
 
     wl_display_set_user_data(d->display, d);
     d->registry = wl_display_get_registry(d->display);
@@ -255,6 +259,7 @@ create_window(void *win_display, int x, int y, int width, int height)
     wl_shell_surface_set_toplevel(shell_surface);
 
     drawable1 = malloc(sizeof(*drawable1));
+    assert(drawable1);
     drawable1->display          = display;
     drawable1->surface          = surface1;
     drawable1->redraw_pending   = 0;
@@ -270,6 +275,7 @@ create_window(void *win_display, int x, int y, int width, int height)
     wl_shell_surface_set_toplevel(shell_surface_2);
 
     drawable2 = malloc(sizeof(*drawable2));
+    assert(drawable2);
     drawable2->display          = display;
     drawable1->surface          = surface2;
     drawable2->redraw_pending   = 0;

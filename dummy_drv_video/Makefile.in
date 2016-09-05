@@ -396,9 +396,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign dummy_drv_video/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu dummy_drv_video/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign dummy_drv_video/Makefile
+	  $(AUTOMAKE) --gnu dummy_drv_video/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
