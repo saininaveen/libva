@@ -197,6 +197,7 @@ bitstream_start(bitstream *bs)
 {
     bs->max_size_in_dword = BITSTREAM_ALLOCATE_STEPPING;
     bs->buffer = calloc(bs->max_size_in_dword * sizeof(int), 1);
+    assert(bs->buffer);
     bs->bit_offset = 0;
 }
 
@@ -234,6 +235,7 @@ bitstream_put_ui(bitstream *bs, unsigned int val, int size_in_bits)
         if (pos + 1 == bs->max_size_in_dword) {
             bs->max_size_in_dword += BITSTREAM_ALLOCATE_STEPPING;
             bs->buffer = realloc(bs->buffer, bs->max_size_in_dword * sizeof(unsigned int));
+            assert(bs->buffer);
         }
 
         bs->buffer[pos + 1] = val;
@@ -858,7 +860,7 @@ static int print_help(void)
 
 static int process_cmdline(int argc, char *argv[])
 {
-    char c;
+    int c;
     const struct option long_opts[] = {
         {"help", no_argument, NULL, 0 },
         {"bitrate", required_argument, NULL, 1 },
@@ -1940,13 +1942,47 @@ static int save_recyuv(VASurfaceID surface_id,
     if (srcyuv_fourcc == VA_FOURCC_NV12) {
         int uv_size = 2 * (frame_width/2) * (frame_height/2);
         dst_Y = malloc(2*uv_size);
+        if(dst_Y == NULL) {
+           printf("Failed to allocate memory for dst_Y\n");
+           exit(1);
+        }
+
         dst_U = malloc(uv_size);
+        if(dst_U == NULL) {
+           printf("Failed to allocate memory for dst_U\n");
+           free(dst_Y);
+           exit(1);
+        }
+
+        memset(dst_Y, 0, 2*uv_size);
+        memset(dst_U, 0, uv_size);
     } else if (srcyuv_fourcc == VA_FOURCC_IYUV ||
                srcyuv_fourcc == VA_FOURCC_YV12) {
         int uv_size = (frame_width/2) * (frame_height/2);
         dst_Y = malloc(4*uv_size);
+        if(dst_Y == NULL) {
+           printf("Failed to allocate memory for dst_Y\n");
+           exit(1);
+        }
+
         dst_U = malloc(uv_size);
+        if(dst_U == NULL) {
+           printf("Failed to allocate memory for dst_U\n");
+           free(dst_Y);
+           exit(1);
+        }
+
         dst_V = malloc(uv_size);
+        if(dst_V == NULL) {
+           printf("Failed to allocate memory for dst_V\n");
+           free(dst_Y);
+           free(dst_U);
+           exit(1);
+        }
+
+        memset(dst_Y, 0, 4*uv_size);
+        memset(dst_U, 0, uv_size);
+        memset(dst_V, 0, uv_size);
     } else {
         printf("Unsupported source YUV format\n");
         exit(1);
@@ -1973,9 +2009,6 @@ static int save_recyuv(VASurfaceID surface_id,
             fwrite(dst_V, uv_size, 1, recyuv_fp);
             fwrite(dst_U, uv_size, 1, recyuv_fp);
         }
-    } else {
-        printf("Unsupported YUV format\n");
-        exit(1);
     }
     
     if (dst_Y)

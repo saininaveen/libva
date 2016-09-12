@@ -1,8 +1,9 @@
-libva (1.7.1-2~bpo8+1) jessie-backports; urgency=medium
+libva (1.7.2-1) unstable; urgency=medium
 
-  * Rebuild for jessie-backports.
+  * New upstream release.
+  * debian/libva1.symbols: Update symbols for new config values.
 
- -- Nicholas D Steeves <nsteeves@gmail.com>  Sun, 24 Jul 2016 16:02:59 -0400
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 05 Sep 2016 09:46:04 +0200
 
 libva (1.7.1-2) unstable; urgency=medium
 
