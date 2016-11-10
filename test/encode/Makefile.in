@@ -102,6 +102,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = avcenc$(EXEEXT) mpeg2vaenc$(EXEEXT) h264encode$(EXEEXT) \
 	jpegenc$(EXEEXT)
+noinst_PROGRAMS = svctenc$(EXEEXT)
 subdir = test/encode
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -117,7 +118,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
-PROGRAMS = $(bin_PROGRAMS)
+PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_avcenc_OBJECTS = avcenc-avcenc.$(OBJEXT)
 avcenc_OBJECTS = $(am_avcenc_OBJECTS)
 avcenc_DEPENDENCIES = $(top_builddir)/va/libva.la \
@@ -149,6 +150,13 @@ mpeg2vaenc_DEPENDENCIES = $(top_builddir)/va/libva.la \
 	$(top_builddir)/test/common/libva-display.la
 mpeg2vaenc_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(mpeg2vaenc_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+am_svctenc_OBJECTS = svctenc-svctenc.$(OBJEXT)
+svctenc_OBJECTS = $(am_svctenc_OBJECTS)
+svctenc_DEPENDENCIES = $(top_builddir)/va/libva.la \
+	$(top_builddir)/test/common/libva-display.la
+svctenc_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(svctenc_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -185,9 +193,9 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(avcenc_SOURCES) $(h264encode_SOURCES) $(jpegenc_SOURCES) \
-	$(mpeg2vaenc_SOURCES)
+	$(mpeg2vaenc_SOURCES) $(svctenc_SOURCES)
 DIST_SOURCES = $(avcenc_SOURCES) $(h264encode_SOURCES) \
-	$(jpegenc_SOURCES) $(mpeg2vaenc_SOURCES)
+	$(jpegenc_SOURCES) $(mpeg2vaenc_SOURCES) $(svctenc_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -398,7 +406,14 @@ jpegenc_CFLAGS = -I$(top_srcdir)/test/common -g
 jpegenc_LDADD = \
 	$(top_builddir)/va/libva.la \
 	$(top_builddir)/test/common/libva-display.la \
-	-lpthread	
+	-lpthread
+
+svctenc_SOURCES = svctenc.c
+svctenc_CFLAGS = -I$(top_srcdir)/test/common -g
+svctenc_LDADD = \
+	$(top_builddir)/va/libva.la \
+	$(top_builddir)/test/common/libva-display.la \
+	-lpthread -lm
 
 EXTRA_DIST = \
 	jpegenc_utils.h \
@@ -417,9 +432,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu test/encode/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign test/encode/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu test/encode/Makefile
+	  $(AUTOMAKE) --foreign test/encode/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -488,6 +503,15 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+clean-noinstPROGRAMS:
+	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
+	echo " rm -f" $$list; \
+	rm -f $$list || exit $$?; \
+	test -n "$(EXEEXT)" || exit 0; \
+	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
+	echo " rm -f" $$list; \
+	rm -f $$list
+
 avcenc$(EXEEXT): $(avcenc_OBJECTS) $(avcenc_DEPENDENCIES) $(EXTRA_avcenc_DEPENDENCIES) 
 	@rm -f avcenc$(EXEEXT)
 	$(AM_V_CCLD)$(avcenc_LINK) $(avcenc_OBJECTS) $(avcenc_LDADD) $(LIBS)
@@ -504,6 +528,10 @@ mpeg2vaenc$(EXEEXT): $(mpeg2vaenc_OBJECTS) $(mpeg2vaenc_DEPENDENCIES) $(EXTRA_mp
 	@rm -f mpeg2vaenc$(EXEEXT)
 	$(AM_V_CCLD)$(mpeg2vaenc_LINK) $(mpeg2vaenc_OBJECTS) $(mpeg2vaenc_LDADD) $(LIBS)
 
+svctenc$(EXEEXT): $(svctenc_OBJECTS) $(svctenc_DEPENDENCIES) $(EXTRA_svctenc_DEPENDENCIES) 
+	@rm -f svctenc$(EXEEXT)
+	$(AM_V_CCLD)$(svctenc_LINK) $(svctenc_OBJECTS) $(svctenc_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -514,6 +542,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/h264encode-h264encode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jpegenc-jpegenc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpeg2vaenc-mpeg2vaenc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/svctenc-svctenc.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -591,6 +620,20 @@ mpeg2vaenc-mpeg2vaenc.obj: mpeg2vaenc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mpeg2vaenc.c' object='mpeg2vaenc-mpeg2vaenc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(mpeg2vaenc_CFLAGS) $(CFLAGS) -c -o mpeg2vaenc-mpeg2vaenc.obj `if test -f 'mpeg2vaenc.c'; then $(CYGPATH_W) 'mpeg2vaenc.c'; else $(CYGPATH_W) '$(srcdir)/mpeg2vaenc.c'; fi`
+
+svctenc-svctenc.o: svctenc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(svctenc_CFLAGS) $(CFLAGS) -MT svctenc-svctenc.o -MD -MP -MF $(DEPDIR)/svctenc-svctenc.Tpo -c -o svctenc-svctenc.o `test -f 'svctenc.c' || echo '$(srcdir)/'`svctenc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/svctenc-svctenc.Tpo $(DEPDIR)/svctenc-svctenc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='svctenc.c' object='svctenc-svctenc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(svctenc_CFLAGS) $(CFLAGS) -c -o svctenc-svctenc.o `test -f 'svctenc.c' || echo '$(srcdir)/'`svctenc.c
+
+svctenc-svctenc.obj: svctenc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(svctenc_CFLAGS) $(CFLAGS) -MT svctenc-svctenc.obj -MD -MP -MF $(DEPDIR)/svctenc-svctenc.Tpo -c -o svctenc-svctenc.obj `if test -f 'svctenc.c'; then $(CYGPATH_W) 'svctenc.c'; else $(CYGPATH_W) '$(srcdir)/svctenc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/svctenc-svctenc.Tpo $(DEPDIR)/svctenc-svctenc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='svctenc.c' object='svctenc-svctenc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(svctenc_CFLAGS) $(CFLAGS) -c -o svctenc-svctenc.obj `if test -f 'svctenc.c'; then $(CYGPATH_W) 'svctenc.c'; else $(CYGPATH_W) '$(srcdir)/svctenc.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -719,7 +762,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -790,22 +834,23 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am check check-am clean \
-	clean-binPROGRAMS clean-generic clean-libtool cscopelist-am \
-	ctags ctags-am distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	clean-binPROGRAMS clean-generic clean-libtool \
+	clean-noinstPROGRAMS cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS
 
 
-valgrind:	$(bin_PROGRAMS)
-	for a in $(bin_PROGRAMS); do \
+valgrind:	$(bin_PROGRAMS) $(noinst_PROGRAMS)
+	for a in $(bin_PROGRAMS) $(noinst_PROGRAMS); do \
 		valgrind --leak-check=full --show-reachable=yes .libs/$$a; \
 	done
 
