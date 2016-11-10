@@ -16,7 +16,7 @@ Build-Depends:
  libxext-dev,
  libxfixes-dev,
  pkg-config,
- perl
+ perl:any
 Standards-Version: 3.9.8
 Homepage: http://www.freedesktop.org/wiki/Software/vaapi
 Vcs-Git: https://anonscm.debian.org/git/pkg-multimedia/libva.git
