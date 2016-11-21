@@ -1,8 +1,19 @@
-libva (1.7.2-1~bpo8+1) jessie-backports; urgency=medium
+libva (1.7.3-2) unstable; urgency=medium
 
-  * Rebuild for jessie-backports.
+  [ Helmut Grohne ]
+  * debian/control: Annotate Build-Depens: perl with :any. (Closes: #841118)
 
- -- Nicholas D Steeves <nsteeves@gmail.com>  Sun, 11 Sep 2016 22:39:26 -0400
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 16 Nov 2016 20:20:29 +0100
+
+libva (1.7.3-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/{control,rules,compat}: Bump to debhelper compat 10.
+  * debian/libva1.symbols: Update symbols for new config values.
+  * debian/libva1.install: No longer install dummy driver.
+  * debian/copyright: Update copyright years.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 10 Nov 2016 10:39:59 +0100
 
 libva (1.7.2-1) unstable; urgency=medium
 

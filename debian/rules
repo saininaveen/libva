@@ -13,7 +13,7 @@ endif
 export DEB_LDFLAGS_MAINT_APPEND=-Wl,--as-needed
 
 %:
-	dh $@ --parallel --with autoreconf
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(confflags)
@@ -23,9 +23,6 @@ debian/dh/dh_libva.1:
 
 override_dh_auto_build: debian/dh/dh_libva.1
 	dh_auto_build
-
-override_dh_makeshlibs:
-	dh_makeshlibs -Xdummy_drv_video.so
 
 debian/shlibs.local:
 	echo "libva 1 libva1 (>= $(DEB_VERSION_UPSTREAM)), libva1 (<< $(DEB_VERSION_UPSTREAM).1)" > debian/shlibs.local
