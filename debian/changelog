@@ -1,9 +1,10 @@
-libva (1.7.3-3) UNRELEASED; urgency=medium
+libva (1.8.0-1) UNRELEASED; urgency=medium
 
+  * New upstream release.
   * debian/{control,watch,copyright}: Update upstream location. (Closes:
     #853270)
 
- -- Sebastian Ramacher <sramacher@debian.org>  Fri, 03 Feb 2017 22:16:41 +0100
+ -- Sebastian Ramacher <sramacher@debian.org>  Sat, 01 Apr 2017 18:17:40 +0200
 
 libva (1.7.3-2) unstable; urgency=medium
 
