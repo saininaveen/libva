@@ -56,7 +56,9 @@ libva.so.1 libva1 #MINVER#
  vaRenderPicture@Base 1.0.3
  vaSetDisplayAttributes@Base 1.0.3
  vaSetDriverName@Base 1.6.0~pre1
+ vaSetErrorCallback@Base 1.8.0
  vaSetImagePalette@Base 1.0.3
+ vaSetInfoCallback@Base 1.8.0
  vaSetSubpictureChromakey@Base 1.0.3
  vaSetSubpictureGlobalAlpha@Base 1.0.3
  vaSetSubpictureImage@Base 1.0.3
