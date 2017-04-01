@@ -1,3 +1,4 @@
 version=4
-opts=filenamemangle=s%(?:.*?)?v?(\d[\d.]*)\.tar\.gz%libva-$1.tar.gz%,uversionmangle=s/\.pre/~pre/ \
-https://github.com/01org/libva/releases .*/(\d+.*)\.tar\.gz
+opts=uversionmangle=s/\.pre/~pre/ \
+  https://github.com/01org/libva/releases \
+  .*/libva-(\d+.*)\.tar\.bz2
