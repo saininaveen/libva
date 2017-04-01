@@ -1,8 +1,7 @@
 #!/usr/bin/make -f
 
 include /usr/share/dpkg/pkg-info.mk
-
-DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+include /usr/share/dpkg/architecture.mk
 
 confflags = --disable-silent-rules --enable-static
 ifeq (,$(findstring linux,$(DEB_HOST_ARCH_OS)))
