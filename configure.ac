@@ -27,8 +27,8 @@
 # - reset micro version to zero when minor version is incremented
 # - reset minor version to zero when major version is incremented
 m4_define([va_api_major_version], [0])
-m4_define([va_api_minor_version], [39])
-m4_define([va_api_micro_version], [4])
+m4_define([va_api_minor_version], [40])
+m4_define([va_api_micro_version], [0])
 
 m4_define([va_api_version],
           [va_api_major_version.va_api_minor_version.va_api_micro_version])
@@ -42,7 +42,7 @@ m4_define([va_api_version],
 # - reset micro version to zero when VA-API major or minor version is changed
 m4_define([libva_major_version], [m4_eval(va_api_major_version + 1)])
 m4_define([libva_minor_version], [m4_eval(va_api_minor_version - 32)])
-m4_define([libva_micro_version], [3])
+m4_define([libva_micro_version], [0])
 m4_define([libva_pre_version],   [0])
 
 m4_define([libva_version],
@@ -81,7 +81,12 @@ m4_define([libdrm_version], [2.4])
 m4_define([wayland_api_version], [1.0.0])
 
 AC_PREREQ(2.57)
-AC_INIT([libva], [libva_version], [waldo.bastian@intel.com], libva)
+AC_INIT([libva],
+        [libva_version],
+        [https://github.com/01org/libva/issues/new],
+        [libva],
+        [https://github.com/01org/libva])
+
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([dist-bzip2])
@@ -148,6 +153,11 @@ AC_ARG_ENABLE([wayland],
                     [build with VA/Wayland API support @<:@default=yes@:>@])],
     [], [enable_wayland="yes"])
 
+AC_ARG_ENABLE([va-messaging],
+    [AC_HELP_STRING([--enable-va-messaging],
+                    [build with va info and error messaging @<:@default=yes@:>@])],
+    [], [enable_va_messaging="yes"])
+
 AC_ARG_ENABLE(dummy-driver,
     [AC_HELP_STRING([--enable-dummy-driver],
                     [build dummy video driver @<:@default=yes@:>@])],
@@ -180,6 +190,11 @@ if test "$enable_docs" = "yes"; then
     fi
 fi
 AM_CONDITIONAL(ENABLE_DOCS, test "$enable_docs" = "yes")
+
+# Check for va messaging
+if test "$enable_va_messaging" = "yes"; then
+    AC_DEFINE([ENABLE_VA_MESSAGING], [1], [Defined to 1 if va messaging is needed])
+fi
 
 # Check for __attribute__((visibility()))
 AC_CACHE_CHECK([whether __attribute__((visibility())) is supported],
@@ -277,6 +292,9 @@ if test "$enable_wayland" = "yes"; then
         WAYLAND_PREFIX=`$PKG_CONFIG --variable=prefix wayland-client`
         AC_PATH_PROG([WAYLAND_SCANNER], [wayland-scanner],,
                      [${WAYLAND_PREFIX}/bin$PATH_SEPARATOR$PATH])
+        if test "x$WAYLAND_SCANNER" = "x"; then
+            AC_MSG_ERROR([wayland-scanner not found: Install it or use --disable-wayland])
+        fi
 
         AC_DEFINE([HAVE_VA_WAYLAND], [1],
                   [Defined to 1 if VA/Wayland API is built])
@@ -300,21 +318,6 @@ AC_DEFINE_UNQUOTED([VA_DRIVER_INIT_FUNC], [$VA_DRIVER_INIT_FUNC],
 
 AC_OUTPUT([
     Makefile
-    debian.upstream/Makefile
-    debian.upstream/changelog
-    debian.upstream/control
-    debian.upstream/libva$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva.install.in
-    debian.upstream/libva-drm$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva-drm.install.in
-    debian.upstream/libva-egl$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva-egl.install.in
-    debian.upstream/libva-glx$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva-glx.install.in
-    debian.upstream/libva-wayland$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva-wayland.install.in
-    debian.upstream/libva-x11-$LIBVA_MAJOR_VERSION.install:\
-debian.upstream/libva-x11.install.in
     doc/Makefile
     dummy_drv_video/Makefile
     pkgconfig/Makefile
@@ -325,13 +328,6 @@ debian.upstream/libva-x11.install.in
     pkgconfig/libva-wayland.pc
     pkgconfig/libva-x11.pc
     pkgconfig/libva.pc
-    test/Makefile
-    test/basic/Makefile
-    test/common/Makefile
-    test/decode/Makefile
-    test/encode/Makefile
-    test/putsurface/Makefile
-    test/vainfo/Makefile
     va/Makefile
     va/drm/Makefile
     va/egl/Makefile
@@ -357,4 +353,5 @@ echo Default driver path .............. : $LIBVA_DRIVERS_PATH
 echo Extra window systems ............. : $BACKENDS
 echo Build dummy driver ............... : $enable_dummy_driver
 echo Build documentation .............. : $enable_docs
+echo Build with messaging ............. : $enable_va_messaging
 echo

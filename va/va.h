@@ -230,6 +230,21 @@ typedef struct _VARectangle
     unsigned short height;
 } VARectangle;
 
+/** Type of a message callback, used for both error and info log. */
+typedef void (*vaMessageCallback)(const char *message);
+
+/**
+ * Set the callback for error messages, or NULL for no logging.
+ * Returns the previous one, or NULL if it was disabled.
+ */
+vaMessageCallback vaSetErrorCallback(vaMessageCallback);
+
+/**
+ * Set the callback for info messages, or NULL for no logging.
+ * Returns the previous one, or NULL if it was disabled.
+ */
+vaMessageCallback vaSetInfoCallback(vaMessageCallback);
+
 /**
  * Initialization:
  * A display must be obtained by calling vaGetDisplay() before calling
@@ -276,7 +291,7 @@ const char *vaQueryVendorString (
     VADisplay dpy
 );
 
-typedef int (*VAPrivFunc)();
+typedef int (*VAPrivFunc)(void);
 
 /**
  * Return a function pointer given a function name in the library.
@@ -1262,12 +1277,22 @@ typedef struct _VAEncMiscParameterRateControl
 typedef struct _VAEncMiscParameterFrameRate
 {
     /*
-     * fps = numerator / denominator
-     * The high 2 bytes (bits 16 to 31) of framerate specifies the numerator, and
-     * the low 2 bytes (bits 0 to 15) of framerate specifies the denominator. For
-     * example, ((100 < 16 ) | 750) is 7.5 fps
+     * The framerate is specified as a number of frames per second, as a
+     * fraction.  The denominator of the fraction is given in the top half
+     * (the high two bytes) of the framerate field, and the numerator is
+     * given in the bottom half (the low two bytes).
      *
-     * If the high 2 btyes is 0, the frame rate is specified by the low 2 bytes.
+     * That is:
+     * denominator = framerate >> 16 & 0xffff;
+     * numerator   = framerate & 0xffff;
+     * fps         = numerator / denominator;
+     *
+     * For example, if framerate is set to (100 << 16 | 750), this is
+     * 750 / 100, hence 7.5fps.
+     *
+     * If the denominator is zero (the high two bytes are both zero) then
+     * it takes the value one instead, so the framerate is just the integer
+     * in the low 2 bytes.
      */
     unsigned int framerate;
     union
@@ -2141,6 +2166,7 @@ typedef struct _VAEncPictureParameterBufferMPEG4
  * eliminates this copy is to pass null as "data" when calling vaCreateBuffer(),
  * and then use vaMapBuffer() to map the data store from the server side to the
  * client address space for access.
+ * The user must call vaDestroyBuffer() to destroy a buffer.
  *  Note: image buffers are created by the library, not the client. Please see 
  *        vaCreateImage on how image buffers are managed.
  */
@@ -2261,7 +2287,12 @@ VAStatus vaUnmapBuffer (
 
 /**
  * After this call, the buffer is deleted and this buffer_id is no longer valid
- * Only call this if the buffer is not going to be passed to vaRenderBuffer
+ *
+ * A buffer can be re-used and sent to the server by another Begin/Render/End
+ * sequence if vaDestroyBuffer() is not called with this buffer.
+ *
+ * Note re-using a shared buffer (e.g. a slice data buffer) between the host and the
+ * hardware accelerator can result in performance dropping.
  */
 VAStatus vaDestroyBuffer (
     VADisplay dpy,
@@ -2389,7 +2420,6 @@ VAStatus vaBeginPicture (
 
 /**
  * Send decode buffers to the server.
- * Buffers are automatically destroyed afterwards
  */
 VAStatus vaRenderPicture (
     VADisplay dpy,
@@ -2529,6 +2559,11 @@ VAStatus vaQuerySurfaceError(
  */
 #define VA_FOURCC_P010          0x30313050
 #define VA_FOURCC_P016          0x36313050
+
+/**
+ * 10-bit Planar YUV 420 and occupy the lower 10-bit.
+ */
+#define VA_FOURCC_I010          0x30313049
 
 /* byte order */
 #define VA_LSB_FIRST		1

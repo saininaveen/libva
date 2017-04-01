@@ -106,11 +106,62 @@ int vaDisplayIsValid(VADisplay dpy)
     return pDisplayContext && (pDisplayContext->vadpy_magic == VA_DISPLAY_MAGIC) && pDisplayContext->vaIsValid(pDisplayContext);
 }
 
+static void default_log_error(const char *buffer)
+{
+# ifdef ANDROID_ALOG
+    ALOGE("%s", buffer);
+# elif ANDROID_LOG
+    LOGE("%s", buffer);
+# else
+    fprintf(stderr, "libva error: %s", buffer);
+# endif
+}
+
+static void default_log_info(const char *buffer)
+{
+# ifdef ANDROID_ALOG
+    ALOGI("%s", buffer);
+# elif ANDROID_LOG
+    LOGI("%s", buffer);
+# else
+    fprintf(stderr, "libva info: %s", buffer);
+# endif
+}
+
+static vaMessageCallback va_log_error = default_log_error;
+static vaMessageCallback va_log_info = default_log_info;
+
+/**
+ * Set the callback for error messages, or NULL for no logging.
+ * Returns the previous one, or NULL if it was disabled.
+ */
+vaMessageCallback vaSetErrorCallback(vaMessageCallback callback)
+{
+    vaMessageCallback old_callback = va_log_error;
+    va_log_error = callback;
+    return old_callback;
+}
+
+/**
+ * Set the callback for info messages, or NULL for no logging.
+ * Returns the previous one, or NULL if it was disabled.
+ */
+vaMessageCallback vaSetInfoCallback(vaMessageCallback callback)
+{
+    vaMessageCallback old_callback = va_log_info;
+    va_log_info = callback;
+    return old_callback;
+}
+
 void va_errorMessage(const char *msg, ...)
 {
+#if ENABLE_VA_MESSAGING
     char buf[512], *dynbuf;
     va_list args;
     int n, len;
+
+    if (va_log_error == NULL)
+        return;
 
     va_start(args, msg);
     len = vsnprintf(buf, sizeof(buf), msg, args);
@@ -129,13 +180,18 @@ void va_errorMessage(const char *msg, ...)
     }
     else if (len > 0)
         va_log_error(buf);
+#endif
 }
 
 void va_infoMessage(const char *msg, ...)
 {
+#if ENABLE_VA_MESSAGING
     char buf[512], *dynbuf;
     va_list args;
     int n, len;
+
+    if (va_log_info == NULL)
+        return;
 
     va_start(args, msg);
     len = vsnprintf(buf, sizeof(buf), msg, args);
@@ -154,6 +210,7 @@ void va_infoMessage(const char *msg, ...)
     }
     else if (len > 0)
         va_log_info(buf);
+#endif
 }
 
 static bool va_checkVtable(void *ptr, char *function)
@@ -250,6 +307,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 int minor;
             } compatible_versions[] = {
                 { VA_MAJOR_VERSION, VA_MINOR_VERSION },
+                { 0, 39 },
                 { 0, 38 },
                 { 0, 37 },
                 { 0, 36 },

@@ -20,14 +20,5 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
-
-AUTOMAKE_OPTIONS = foreign
-
-SUBDIRS = va dummy_drv_video pkgconfig doc
-
 # Extra clean files so that maintainer-clean removes *everything*
-MAINTAINERCLEANFILES = \
-	aclocal.m4 compile config.guess config.sub \
-	configure depcomp install-sh ltmain.sh     \
-	Makefile.in missing
+MAINTAINERCLEANFILES = Makefile.in
