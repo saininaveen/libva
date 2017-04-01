@@ -72,25 +72,25 @@ Last-Update: 2014-12-15
  {
      char *token, *value, *saveptr;
      char oneline[1024];
-@@ -102,7 +102,7 @@
-     return pDisplayContext && (pDisplayContext->vadpy_magic == VA_DISPLAY_MAGIC) && pDisplayContext->vaIsValid(pDisplayContext);
+@@ -153,7 +153,7 @@
+     return old_callback;
  }
  
 -void va_errorMessage(const char *msg, ...)
 +DLL_HIDDEN void va_errorMessage(const char *msg, ...)
  {
+ #if ENABLE_VA_MESSAGING
      char buf[512], *dynbuf;
-     va_list args;
-@@ -127,7 +127,7 @@
-         va_log_error(buf);
+@@ -183,7 +183,7 @@
+ #endif
  }
  
 -void va_infoMessage(const char *msg, ...)
 +DLL_HIDDEN void va_infoMessage(const char *msg, ...)
  {
+ #if ENABLE_VA_MESSAGING
      char buf[512], *dynbuf;
-     va_list args;
-@@ -1029,7 +1029,7 @@
+@@ -1189,7 +1189,7 @@
    return ctx->vtable->vaDestroyBuffer( ctx, buffer_id );
  }
  
@@ -99,7 +99,7 @@ Last-Update: 2014-12-15
      VADisplay dpy,
      VAContextID context,	/* in */
      VABufferID buf_id,		/* in */
-@@ -1612,7 +1612,7 @@
+@@ -1772,7 +1772,7 @@
    return va_status;
  }
  
@@ -108,7 +108,7 @@ Last-Update: 2014-12-15
      VASurfaceID surface,
      unsigned int *fourcc, /* following are output argument */
      unsigned int *luma_stride,
-@@ -1633,7 +1633,7 @@
+@@ -1793,7 +1793,7 @@
  }
  
  
