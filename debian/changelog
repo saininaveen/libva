@@ -1,8 +1,11 @@
-libva (1.8.3-1) UNRELEASED; urgency=medium
+libva (1.8.3-1) unstable; urgency=medium
 
   * New upstream release.
+  * debian/patches: Refresh patches.
+  * debian/rules: Remove obsolete options.
+  * debian/contol: Bump Standards-Version.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Thu, 29 Jun 2017 20:09:02 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Thu, 29 Jun 2017 20:33:59 +0200
 
 libva (1.8.2-2) unstable; urgency=medium
 
