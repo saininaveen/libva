@@ -17,7 +17,7 @@ Build-Depends:
  libxfixes-dev,
  pkg-config,
  perl:any
-Standards-Version: 3.9.8
+Standards-Version: 4.0.0
 Homepage: https://01.org/linuxmedia/vaapi
 Vcs-Git: https://anonscm.debian.org/git/pkg-multimedia/libva.git
 Vcs-Browser: https://anonscm.debian.org/cgit/pkg-multimedia/libva.git
