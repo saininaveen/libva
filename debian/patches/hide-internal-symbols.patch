@@ -63,7 +63,7 @@ Last-Update: 2014-12-15
  }
 --- a/va/va.c
 +++ b/va/va.c
-@@ -54,7 +54,7 @@
+@@ -64,7 +64,7 @@
   * return 0: the "env" is set, and the value is copied into env_value
   *        1: the env is not set
   */
@@ -72,8 +72,17 @@ Last-Update: 2014-12-15
  {
      char *token, *value, *saveptr;
      char oneline[1024];
-@@ -153,7 +153,7 @@
+@@ -159,7 +159,7 @@
      return old_callback;
+ }
+ 
+-void va_MessagingInit()
++static void va_MessagingInit()
+ {
+ #if ENABLE_VA_MESSAGING
+     char env_value[1024];
+@@ -177,7 +177,7 @@
+ #endif
  }
  
 -void va_errorMessage(const char *msg, ...)
@@ -81,7 +90,7 @@ Last-Update: 2014-12-15
  {
  #if ENABLE_VA_MESSAGING
      char buf[512], *dynbuf;
-@@ -183,7 +183,7 @@
+@@ -207,7 +207,7 @@
  #endif
  }
  
@@ -90,7 +99,7 @@ Last-Update: 2014-12-15
  {
  #if ENABLE_VA_MESSAGING
      char buf[512], *dynbuf;
-@@ -1189,7 +1189,7 @@
+@@ -1215,7 +1215,7 @@
    return ctx->vtable->vaDestroyBuffer( ctx, buffer_id );
  }
  
@@ -99,7 +108,7 @@ Last-Update: 2014-12-15
      VADisplay dpy,
      VAContextID context,	/* in */
      VABufferID buf_id,		/* in */
-@@ -1772,7 +1772,7 @@
+@@ -1798,7 +1798,7 @@
    return va_status;
  }
  
@@ -108,7 +117,7 @@ Last-Update: 2014-12-15
      VASurfaceID surface,
      unsigned int *fourcc, /* following are output argument */
      unsigned int *luma_stride,
-@@ -1793,7 +1793,7 @@
+@@ -1819,7 +1819,7 @@
  }
  
  
