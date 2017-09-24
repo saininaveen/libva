@@ -3,7 +3,7 @@
 include /usr/share/dpkg/pkg-info.mk
 include /usr/share/dpkg/architecture.mk
 
-confflags  = --enable-messaging
+confflags  = --enable-va-messaging
 ifeq (,$(findstring linux,$(DEB_HOST_ARCH_OS)))
 # wayland is only available on linux-any
 confflags += --disable-wayland
