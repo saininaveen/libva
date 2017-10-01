@@ -26,12 +26,11 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends:
- libva-drm1 (= ${binary:Version}),
- libva-glx1 (= ${binary:Version}),
- libva-tpi1 (= ${binary:Version}),
- libva-wayland1 (= ${binary:Version}) [linux-any],
- libva-x11-1 (= ${binary:Version}),
- libva1 (= ${binary:Version}),
+ libva-drm2 (= ${binary:Version}),
+ libva-glx2 (= ${binary:Version}),
+ libva-wayland2 (= ${binary:Version}) [linux-any],
+ libva-x11-2 (= ${binary:Version}),
+ libva2 (= ${binary:Version}),
  libwayland-dev (>= 1.0.0) [linux-any],
  ${misc:Depends},
  libset-scalar-perl
@@ -47,7 +46,7 @@ Description: Video Acceleration (VA) API for Linux -- development files
  .
  This package provides the development environment for libva.
 
-Package: libva1
+Package: libva2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -78,7 +77,7 @@ Description: Video Acceleration (VA) API for Linux -- runtime
  .
  This package provides the main libva library.
 
-Package: libva-x11-1
+Package: libva-x11-2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -97,7 +96,7 @@ Description: Video Acceleration (VA) API for Linux -- X11 runtime
  .
  This package provides the libva-x11 library.
 
-Package: libva-glx1
+Package: libva-glx2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -116,26 +115,7 @@ Description: Video Acceleration (VA) API for Linux -- GLX runtime
  .
  This package provides the libva-glx library.
 
-Package: libva-tpi1
-Architecture: any
-Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
-Depends:
- ${misc:Depends},
- ${shlibs:Depends}
-Description: Video Acceleration (VA) API for Linux -- TPI runtime
- Video Acceleration API (VA API) is a library ("libVA") and API specification
- which enables and provides access to graphics hardware (GPU) acceleration for
- video processing on Linux and UNIX based operating systems. Accelerated
- processing includes video decoding, video encoding, subpicture blending and
- rendering. The specification was originally designed by Intel for its GMA
- (Graphics Media Accelerator) series of GPU hardware, the API is however not
- limited to GPUs or Intel specific hardware, as other hardware and manufacturers
- can also freely use this API for hardware accelerated video decoding.
- .
- This package provides the libva-tpi library.
-
-Package: libva-drm1
+Package: libva-drm2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -154,7 +134,7 @@ Description: Video Acceleration (VA) API for Linux -- DRM runtime
  .
  This package provides the libva-drm library.
 
-Package: libva-wayland1
+Package: libva-wayland2
 Architecture: linux-any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
