@@ -6,9 +6,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define to 1 if you have the <EGL/egl.h> header file. */
-#undef HAVE_EGL_EGL_H
-
 /* Define to 1 if you have the <GL/glx.h> header file. */
 #undef HAVE_GL_GLX_H
 
@@ -47,9 +44,6 @@
 
 /* Defined to 1 if VA/DRM API is built */
 #undef HAVE_VA_DRM
-
-/* Defined to 1 if VA/EGL API is built */
-#undef HAVE_VA_EGL
 
 /* Defined to 1 if VA/GLX API is built */
 #undef HAVE_VA_GLX

@@ -118,10 +118,8 @@ host_triplet = @host@
 @USE_X11_TRUE@am__append_5 = va_x11.h
 @USE_GLX_TRUE@am__append_6 = glx
 @USE_GLX_TRUE@am__append_7 = libva-glx.la
-@USE_EGL_TRUE@am__append_8 = egl
-@USE_EGL_TRUE@am__append_9 = libva-egl.la
-@USE_WAYLAND_TRUE@am__append_10 = wayland
-@USE_WAYLAND_TRUE@am__append_11 = libva-wayland.la
+@USE_WAYLAND_TRUE@am__append_8 = wayland
+@USE_WAYLAND_TRUE@am__append_9 = libva-wayland.la
 subdir = va
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -176,23 +174,12 @@ libva_drm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libva_drm_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_DRM_TRUE@am_libva_drm_la_rpath = -rpath $(libdir)
-am_libva_egl_la_OBJECTS =
-libva_egl_la_OBJECTS = $(am_libva_egl_la_OBJECTS)
-libva_egl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_egl_la_LDFLAGS) $(LDFLAGS) -o $@
-@USE_EGL_TRUE@am_libva_egl_la_rpath = -rpath $(libdir)
 am_libva_glx_la_OBJECTS =
 libva_glx_la_OBJECTS = $(am_libva_glx_la_OBJECTS)
 libva_glx_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libva_glx_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GLX_TRUE@am_libva_glx_la_rpath = -rpath $(libdir)
-am_libva_tpi_la_OBJECTS = va_tpi.lo
-libva_tpi_la_OBJECTS = $(am_libva_tpi_la_OBJECTS)
-libva_tpi_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_tpi_la_LDFLAGS) $(LDFLAGS) -o $@
 am_libva_wayland_la_OBJECTS =
 libva_wayland_la_OBJECTS = $(am_libva_wayland_la_OBJECTS)
 libva_wayland_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -206,7 +193,7 @@ libva_x11_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libva_x11_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_X11_TRUE@am_libva_x11_la_rpath = -rpath $(libdir)
-am__objects_1 = va.lo va_compat.lo va_fool.lo va_trace.lo
+am__objects_1 = va.lo va_compat.lo va_fool.lo va_str.lo va_trace.lo
 am_libva_la_OBJECTS = $(am__objects_1)
 libva_la_OBJECTS = $(am_libva_la_OBJECTS)
 libva_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -246,12 +233,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libva_drm_la_SOURCES) $(libva_egl_la_SOURCES) \
-	$(libva_glx_la_SOURCES) $(libva_tpi_la_SOURCES) \
+SOURCES = $(libva_drm_la_SOURCES) $(libva_glx_la_SOURCES) \
 	$(libva_wayland_la_SOURCES) $(libva_x11_la_SOURCES) \
 	$(libva_la_SOURCES)
-DIST_SOURCES = $(libva_drm_la_SOURCES) $(libva_egl_la_SOURCES) \
-	$(libva_glx_la_SOURCES) $(libva_tpi_la_SOURCES) \
+DIST_SOURCES = $(libva_drm_la_SOURCES) $(libva_glx_la_SOURCES) \
 	$(libva_wayland_la_SOURCES) $(libva_x11_la_SOURCES) \
 	$(libva_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
@@ -267,11 +252,12 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__libvainclude_HEADERS_DIST = va.h va_backend.h va_backend_tpi.h \
-	va_backend_vpp.h va_compat.h va_dec_hevc.h va_dec_jpeg.h \
-	va_dec_vp8.h va_dec_vp9.h va_drmcommon.h va_enc_hevc.h \
-	va_enc_h264.h va_enc_jpeg.h va_enc_vp8.h va_enc_mpeg2.h \
-	va_enc_vp9.h va_tpi.h va_version.h va_vpp.h va_x11.h
+am__libvainclude_HEADERS_DIST = va.h va_backend.h va_backend_vpp.h \
+	va_compat.h va_dec_hevc.h va_dec_jpeg.h va_dec_vp8.h \
+	va_dec_vp9.h va_drmcommon.h va_egl.h va_enc_hevc.h \
+	va_enc_h264.h va_enc_jpeg.h va_enc_vp8.h va_fei.h \
+	va_fei_h264.h va_enc_mpeg2.h va_enc_vp9.h va_str.h va_tpi.h \
+	va_version.h va_vpp.h va_x11.h
 HEADERS = $(libvainclude_HEADERS) $(noinst_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
@@ -357,8 +343,6 @@ DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGL_CFLAGS = @EGL_CFLAGS@
-EGL_LIBS = @EGL_LIBS@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
@@ -424,10 +408,6 @@ WAYLAND_LIBS = @WAYLAND_LIBS@
 WAYLAND_SCANNER = @WAYLAND_SCANNER@
 X11_CFLAGS = @X11_CFLAGS@
 X11_LIBS = @X11_LIBS@
-XEXT_CFLAGS = @XEXT_CFLAGS@
-XEXT_LIBS = @XEXT_LIBS@
-XFIXES_CFLAGS = @XFIXES_CFLAGS@
-XFIXES_LIBS = @XFIXES_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -484,7 +464,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = $(am__append_1) $(am__append_3) $(am__append_6) \
-	$(am__append_8) $(am__append_10)
+	$(am__append_8)
 AM_CPPFLAGS = \
 	-I$(top_srcdir) \
 	-DVA_DRIVERS_PATH="\"$(LIBVA_DRIVERS_PATH)\""
@@ -496,17 +476,20 @@ libva_source_c = \
 	va.c			\
 	va_compat.c		\
 	va_fool.c		\
+	va_str.c		\
 	va_trace.c		\
 	$(NULL)
 
-libva_source_h = va.h va_backend.h va_backend_tpi.h va_backend_vpp.h \
-	va_compat.h va_dec_hevc.h va_dec_jpeg.h va_dec_vp8.h \
-	va_dec_vp9.h va_drmcommon.h va_enc_hevc.h va_enc_h264.h \
-	va_enc_jpeg.h va_enc_vp8.h va_enc_mpeg2.h va_enc_vp9.h \
-	va_tpi.h va_version.h va_vpp.h $(NULL) $(am__append_5)
+libva_source_h = va.h va_backend.h va_backend_vpp.h va_compat.h \
+	va_dec_hevc.h va_dec_jpeg.h va_dec_vp8.h va_dec_vp9.h \
+	va_drmcommon.h va_egl.h va_enc_hevc.h va_enc_h264.h \
+	va_enc_jpeg.h va_enc_vp8.h va_fei.h va_fei_h264.h \
+	va_enc_mpeg2.h va_enc_vp9.h va_str.h va_tpi.h va_version.h \
+	va_vpp.h $(NULL) $(am__append_5)
 libva_source_h_priv = \
 	sysdeps.h		\
 	va_fool.h		\
+	va_internal.h		\
 	va_trace.h		\
 	$(NULL)
 
@@ -515,9 +498,8 @@ libva_ldflags = \
 	-Wl,-version-script,${srcdir}/libva.syms \
 	$(NULL)
 
-lib_LTLIBRARIES = libva.la libva-tpi.la $(am__append_2) \
-	$(am__append_4) $(am__append_7) $(am__append_9) \
-	$(am__append_11)
+lib_LTLIBRARIES = libva.la $(am__append_2) $(am__append_4) \
+	$(am__append_7) $(am__append_9)
 libvaincludedir = ${includedir}/va
 libvainclude_HEADERS = $(libva_source_h)
 noinst_HEADERS = $(libva_source_h_priv)
@@ -525,10 +507,6 @@ libva_la_SOURCES = $(libva_source_c)
 libva_la_LDFLAGS = $(libva_ldflags)
 libva_la_DEPENDENCIES = libva.syms
 libva_la_LIBADD = $(LIBVA_LIBS) -ldl
-libva_tpi_la_SOURCES = va_tpi.c
-libva_tpi_la_LDFLAGS = $(LDADD) -no-undefined
-libva_tpi_la_DEPENDENCIES = libva.la 
-libva_tpi_la_LIBADD = libva.la -ldl
 @USE_DRM_TRUE@libva_drm_la_SOURCES = 
 @USE_DRM_TRUE@libva_drm_la_LDFLAGS = $(LDADD)
 @USE_DRM_TRUE@libva_drm_la_DEPENDENCIES = libva.la drm/libva_drm.la
@@ -547,19 +525,13 @@ libva_tpi_la_LIBADD = libva.la -ldl
 @USE_GLX_TRUE@libva_glx_la_LIBADD = libva.la glx/libva_glx.la libva-x11.la \
 @USE_GLX_TRUE@	$(GLX_LIBS) -ldl
 
-@USE_EGL_TRUE@libva_egl_la_SOURCES = 
-@USE_EGL_TRUE@libva_egl_la_LDFLAGS = $(LDADD)
-@USE_EGL_TRUE@libva_egl_la_DEPENDENCIES = libva.la egl/libva_egl.la 
-@USE_EGL_TRUE@libva_egl_la_LIBADD = libva.la egl/libva_egl.la \
-@USE_EGL_TRUE@	$(EGL_LIBS) -ldl
-
 @USE_WAYLAND_TRUE@libva_wayland_la_SOURCES = 
 @USE_WAYLAND_TRUE@libva_wayland_la_LDFLAGS = $(LDADD)
 @USE_WAYLAND_TRUE@libva_wayland_la_DEPENDENCIES = libva.la wayland/libva_wayland.la
 @USE_WAYLAND_TRUE@libva_wayland_la_LIBADD = libva.la wayland/libva_wayland.la \
 @USE_WAYLAND_TRUE@	$(WAYLAND_LIBS) $(DRM_LIBS) -ldl
 
-DIST_SUBDIRS = x11 glx egl drm wayland
+DIST_SUBDIRS = x11 glx drm wayland
 DISTCLEANFILES = \
 	va_version.h		\
 	$(NULL)
@@ -643,14 +615,8 @@ clean-libLTLIBRARIES:
 libva-drm.la: $(libva_drm_la_OBJECTS) $(libva_drm_la_DEPENDENCIES) $(EXTRA_libva_drm_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libva_drm_la_LINK) $(am_libva_drm_la_rpath) $(libva_drm_la_OBJECTS) $(libva_drm_la_LIBADD) $(LIBS)
 
-libva-egl.la: $(libva_egl_la_OBJECTS) $(libva_egl_la_DEPENDENCIES) $(EXTRA_libva_egl_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libva_egl_la_LINK) $(am_libva_egl_la_rpath) $(libva_egl_la_OBJECTS) $(libva_egl_la_LIBADD) $(LIBS)
-
 libva-glx.la: $(libva_glx_la_OBJECTS) $(libva_glx_la_DEPENDENCIES) $(EXTRA_libva_glx_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libva_glx_la_LINK) $(am_libva_glx_la_rpath) $(libva_glx_la_OBJECTS) $(libva_glx_la_LIBADD) $(LIBS)
-
-libva-tpi.la: $(libva_tpi_la_OBJECTS) $(libva_tpi_la_DEPENDENCIES) $(EXTRA_libva_tpi_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libva_tpi_la_LINK) -rpath $(libdir) $(libva_tpi_la_OBJECTS) $(libva_tpi_la_LIBADD) $(LIBS)
 
 libva-wayland.la: $(libva_wayland_la_OBJECTS) $(libva_wayland_la_DEPENDENCIES) $(EXTRA_libva_wayland_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libva_wayland_la_LINK) $(am_libva_wayland_la_rpath) $(libva_wayland_la_OBJECTS) $(libva_wayland_la_LIBADD) $(LIBS)
@@ -670,7 +636,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_compat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_fool.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_tpi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_str.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_trace.Plo@am__quote@
 
 .c.o:

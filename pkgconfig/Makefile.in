@@ -113,8 +113,7 @@ host_triplet = @host@
 @USE_DRM_TRUE@am__append_1 = libva-drm.pc
 @USE_X11_TRUE@am__append_2 = libva-x11.pc
 @USE_GLX_TRUE@am__append_3 = libva-glx.pc
-@USE_EGL_TRUE@am__append_4 = libva-egl.pc
-@USE_WAYLAND_TRUE@am__append_5 = libva-wayland.pc
+@USE_WAYLAND_TRUE@am__append_4 = libva-wayland.pc
 subdir = pkgconfig
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -126,8 +125,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = libva-drm.pc libva-egl.pc libva-glx.pc \
-	libva-tpi.pc libva-wayland.pc libva-x11.pc libva.pc
+CONFIG_CLEAN_FILES = libva-drm.pc libva-glx.pc libva-wayland.pc \
+	libva-x11.pc libva.pc
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -179,8 +178,7 @@ am__installdirs = "$(DESTDIR)$(pkgconfigdir)"
 DATA = $(pkgconfig_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/libva-drm.pc.in \
-	$(srcdir)/libva-egl.pc.in $(srcdir)/libva-glx.pc.in \
-	$(srcdir)/libva-tpi.pc.in $(srcdir)/libva-wayland.pc.in \
+	$(srcdir)/libva-glx.pc.in $(srcdir)/libva-wayland.pc.in \
 	$(srcdir)/libva-x11.pc.in $(srcdir)/libva.pc.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -212,8 +210,6 @@ DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
-EGL_CFLAGS = @EGL_CFLAGS@
-EGL_LIBS = @EGL_LIBS@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
@@ -279,10 +275,6 @@ WAYLAND_LIBS = @WAYLAND_LIBS@
 WAYLAND_SCANNER = @WAYLAND_SCANNER@
 X11_CFLAGS = @X11_CFLAGS@
 X11_LIBS = @X11_LIBS@
-XEXT_CFLAGS = @XEXT_CFLAGS@
-XEXT_LIBS = @XEXT_LIBS@
-XFIXES_CFLAGS = @XFIXES_CFLAGS@
-XFIXES_LIBS = @XFIXES_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -338,11 +330,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-pcfiles = libva.pc libva-tpi.pc $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
-all_pcfiles_in = libva.pc.in libva-tpi.pc.in libva-drm.pc.in \
-	libva-x11.pc.in libva-glx.pc.in libva-egl.pc.in \
-	libva-wayland.pc.in
+pcfiles = libva.pc $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4)
+all_pcfiles_in = libva.pc.in libva-drm.pc.in libva-x11.pc.in \
+	libva-glx.pc.in libva-wayland.pc.in
 pkgconfig_DATA = $(pcfiles)
 EXTRA_DIST = $(all_pcfiles_in)
 DISTCLEANFILES = $(pcfiles)
@@ -383,11 +374,7 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 $(am__aclocal_m4_deps):
 libva-drm.pc: $(top_builddir)/config.status $(srcdir)/libva-drm.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-libva-egl.pc: $(top_builddir)/config.status $(srcdir)/libva-egl.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 libva-glx.pc: $(top_builddir)/config.status $(srcdir)/libva-glx.pc.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-libva-tpi.pc: $(top_builddir)/config.status $(srcdir)/libva-tpi.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 libva-wayland.pc: $(top_builddir)/config.status $(srcdir)/libva-wayland.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
