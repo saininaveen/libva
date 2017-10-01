@@ -1,3 +1,9 @@
+libva (2.0.0~pre2-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 01 Oct 2017 22:57:27 +0200
+
 libva (1.8.3-2) unstable; urgency=medium
 
   * debian/{control,rules}: Remove libva-egl1. va-egl is going to be removed
