@@ -1,8 +1,16 @@
-libva (2.0.0~pre2-1) UNRELEASED; urgency=medium
+libva (2.0.0~pre2-1) experimental; urgency=medium
 
   * New upstream release.
+  * SONAME bump libva*1 -> libva*2.
+  * debian/control:
+    - Update Provides.
+    - Bump Standards-Version.
+  * debian/rules: Drop unused flags.
+  * debian/clean: Re-build source files built by wayland-scanner.
+  * debian/patches: Removed.
+  * debian/copyright: Update copyright years.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Sun, 01 Oct 2017 22:57:27 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 01 Oct 2017 23:36:37 +0200
 
 libva (1.8.3-2) unstable; urgency=medium
 
