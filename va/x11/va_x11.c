@@ -26,6 +26,7 @@
 #include "sysdeps.h"
 #include "va.h"
 #include "va_backend.h"
+#include "va_internal.h"
 #include "va_trace.h"
 #include "va_fool.h"
 #include "va_x11.h"
@@ -80,7 +81,7 @@ static VAStatus va_DRI2GetDriverName (
 {
     VADriverContextP ctx = pDisplayContext->pDriverContext;
 
-    if (!isDRI2Connected(ctx, driver_name))
+    if (!va_isDRI2Connected(ctx, driver_name))
         return VA_STATUS_ERROR_UNKNOWN;
 
     return VA_STATUS_SUCCESS;
@@ -163,13 +164,11 @@ VADisplay vaGetDisplay (
       /* create new entry */
       VADriverContextP pDriverContext;
       struct dri_state *dri_state;
-      pDisplayContext = calloc(1, sizeof(*pDisplayContext));
+      pDisplayContext = va_newDisplayContext();
       pDriverContext  = calloc(1, sizeof(*pDriverContext));
       dri_state       = calloc(1, sizeof(*dri_state));
       if (pDisplayContext && pDriverContext && dri_state)
       {
-	  pDisplayContext->vadpy_magic = VA_DISPLAY_MAGIC;          
-
 	  pDriverContext->native_dpy       = (void *)native_dpy;
 	  pDriverContext->x11_screen       = XDefaultScreen(native_dpy);
           pDriverContext->display_type     = VA_DISPLAY_X11;
@@ -195,8 +194,6 @@ VADisplay vaGetDisplay (
   return dpy;
 }
 
-#define CTX(dpy) (((VADisplayContextP)dpy)->pDriverContext)
-#define CHECK_DISPLAY(dpy) if( !vaDisplayIsValid(dpy) ) { return VA_STATUS_ERROR_INVALID_DISPLAY; }
 
 void va_TracePutSurface (
     VADisplay dpy,
@@ -235,7 +232,7 @@ VAStatus vaPutSurface (
 {
   VADriverContextP ctx;
 
-  if (fool_postp)
+  if (va_fool_postp)
       return VA_STATUS_SUCCESS;
 
   CHECK_DISPLAY(dpy);
