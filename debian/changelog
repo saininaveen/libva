@@ -1,8 +1,8 @@
-libva (2.0.0~pre3-1) UNRELEASED; urgency=medium
+libva (2.0.0~pre3-1) experimental; urgency=medium
 
   * New upstream release.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Mon, 16 Oct 2017 18:34:59 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 16 Oct 2017 18:35:50 +0200
 
 libva (2.0.0~pre2-1) experimental; urgency=medium
 
