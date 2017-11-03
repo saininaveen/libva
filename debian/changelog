@@ -1,9 +1,10 @@
-libva (2.0.0-1) UNRELEASED; urgency=medium
+libva (2.0.0-1) unstable; urgency=medium
 
   * New upstream release.
   * Upload to unstable.
+  * debian/*.symbols: Bump symbol versions.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Fri, 03 Nov 2017 14:49:26 -0500
+ -- Sebastian Ramacher <sramacher@debian.org>  Fri, 03 Nov 2017 14:54:08 -0500
 
 libva (2.0.0~pre3-1) experimental; urgency=medium
 
