@@ -24,7 +24,7 @@ override_dh_auto_build: debian/dh/dh_libva.1
 	dh_auto_build
 
 debian/shlibs.local:
-	echo "libva 1 libva1 (>= $(DEB_VERSION_UPSTREAM)), libva1 (<< $(DEB_VERSION_UPSTREAM).1)" > debian/shlibs.local
+	echo "libva 2 libva2 (>= $(DEB_VERSION_UPSTREAM)), libva2 (<< $(DEB_VERSION_UPSTREAM).1)" > debian/shlibs.local
 
 override_dh_shlibdeps: debian/shlibs.local
 	dh_shlibdeps
