@@ -1,8 +1,9 @@
 libva (2.0.0-2) unstable; urgency=medium
 
   * debian/patches: dlopen correct version of libva-x11. (Closes: #881521)
+  * debian/rules: Fix debian/shlibs.local generation.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Sun, 12 Nov 2017 19:06:38 +0100
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 12 Nov 2017 19:10:16 +0100
 
 libva (2.0.0-1) unstable; urgency=medium
 
