@@ -9,10 +9,12 @@ libva.so.2 libva2 #MINVER#
  vaBufferSetNumElements@Base 1.0.3
  vaBufferTypeStr@Base 2.0.0
  vaConfigAttribTypeStr@Base 2.0.0
+ vaCreateBuffer2@Base 2.1.0
  vaCreateBuffer@Base 1.7.1
  vaCreateConfig@Base 1.7.3
  vaCreateContext@Base 1.0.3
  vaCreateImage@Base 1.0.3
+ vaCreateMFContext@Base 2.1.0
  vaCreateSubpicture@Base 1.0.3
  vaCreateSurfaces@VA_API_0.32.0 1.2.0
  vaCreateSurfaces@VA_API_0.33.0 1.2.0
@@ -28,12 +30,16 @@ libva.so.2 libva2 #MINVER#
  vaEndPicture@Base 1.0.3
  vaEntrypointStr@Base 2.0.0
  vaErrorStr@Base 1.0.3
+ vaExportSurfaceHandle@Base 2.1.0
  vaGetConfigAttributes@Base 1.7.3
  vaGetDisplayAttributes@Base 1.0.3
  vaGetImage@Base 1.0.3
  vaGetLibFunc@Base 1.0.3
  vaInitialize@Base 1.0.3
  vaLockSurface@Base 2.0.0
+ vaMFAddContext@Base 2.1.0
+ vaMFReleaseContext@Base 2.1.0
+ vaMFSubmit@Base 2.1.0
  vaMapBuffer@Base 1.0.3
  vaMaxNumConfigAttributes@Base 1.0.3
  vaMaxNumDisplayAttributes@Base 1.0.3
@@ -48,6 +54,7 @@ libva.so.2 libva2 #MINVER#
  vaQueryConfigProfiles@Base 1.7.0
  vaQueryDisplayAttributes@Base 1.0.3
  vaQueryImageFormats@Base 1.0.3
+ vaQueryProcessingRate@Base 2.1.0
  vaQuerySubpictureFormats@Base 1.0.3
  vaQuerySurfaceAttributes@Base 1.2.0
  vaQuerySurfaceError@Base 1.0.8
@@ -83,5 +90,6 @@ libva.so.2 libva2 #MINVER#
  va_fool_postp@Base 2.0.0
  va_infoMessage@Base 2.0.0
  va_newDisplayContext@Base 2.0.0
+ va_newDriverContext@Base 2.1.0
  va_parseConfig@Base 2.0.0
  va_trace_flag@Base 2.0.0
