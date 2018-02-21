@@ -1,3 +1,14 @@
+libva (2.1.0-1) UNRELEASED; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/copyright: Use https protocol in Format field
+  * d/control: Set Vcs-* to salsa.debian.org
+
+  [ Sebastian Ramacher ]
+  * New upstream release.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 21 Feb 2018 20:31:13 +0100
+
 libva (2.0.0-2) unstable; urgency=medium
 
   * debian/patches: dlopen correct version of libva-x11. (Closes: #881521)
