@@ -7,7 +7,7 @@ Uploaders:
  Matteo F. Vescovi <mfv@debian.org>,
  Sebastian Ramacher <sramacher@debian.org>
 Build-Depends:
- debhelper (>= 10),
+ debhelper (>= 11),
  libdrm-dev,
  libgl1-mesa-dev | libgl-dev,
  libwayland-dev (>= 1.0.0) [linux-any],
