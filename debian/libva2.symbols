@@ -7,8 +7,8 @@ libva.so.2 libva2 #MINVER#
  vaBeginPicture@Base 1.0.3
  vaBufferInfo@Base 2.0.0
  vaBufferSetNumElements@Base 1.0.3
- vaBufferTypeStr@Base 2.0.0
- vaConfigAttribTypeStr@Base 2.0.0
+ vaBufferTypeStr@Base 2.1.0
+ vaConfigAttribTypeStr@Base 2.1.0
  vaCreateBuffer2@Base 2.1.0
  vaCreateBuffer@Base 1.7.1
  vaCreateConfig@Base 1.7.3
@@ -28,7 +28,7 @@ libva.so.2 libva2 #MINVER#
  vaDestroySurfaces@Base 1.0.3
  vaDisplayIsValid@Base 1.0.3
  vaEndPicture@Base 1.0.3
- vaEntrypointStr@Base 2.0.0
+ vaEntrypointStr@Base 2.1.0
  vaErrorStr@Base 1.0.3
  vaExportSurfaceHandle@Base 2.1.0
  vaGetConfigAttributes@Base 1.7.3
@@ -43,14 +43,14 @@ libva.so.2 libva2 #MINVER#
  vaMapBuffer@Base 1.0.3
  vaMaxNumConfigAttributes@Base 1.0.3
  vaMaxNumDisplayAttributes@Base 1.0.3
- vaMaxNumEntrypoints@Base 1.0.3
+ vaMaxNumEntrypoints@Base 2.1.0
  vaMaxNumImageFormats@Base 1.0.3
  vaMaxNumProfiles@Base 1.0.3
  vaMaxNumSubpictureFormats@Base 1.0.3
  vaProfileStr@Base 2.0.0
  vaPutImage@Base 1.0.3
- vaQueryConfigAttributes@Base 1.7.3
- vaQueryConfigEntrypoints@Base 1.7.1
+ vaQueryConfigAttributes@Base 2.1.0
+ vaQueryConfigEntrypoints@Base 2.1.0
  vaQueryConfigProfiles@Base 1.7.0
  vaQueryDisplayAttributes@Base 1.0.3
  vaQueryImageFormats@Base 1.0.3
