@@ -1,4 +1,4 @@
-libva (2.1.0-1) UNRELEASED; urgency=medium
+libva (2.1.0-1) unstable; urgency=medium
 
   [ Ondřej Nový ]
   * d/copyright: Use https protocol in Format field
@@ -6,8 +6,17 @@ libva (2.1.0-1) UNRELEASED; urgency=medium
 
   [ Sebastian Ramacher ]
   * New upstream release.
+  * debian/control:
+    - Bump Standards-Version.
+    - Add new driver ABI provides.
+  * debian/: Bump debhelper compat to 11.
+  * debian/patches: Drop patch, included upstream.
+  * debian/libva2.symbols:
+    - Add new symbols.
+    - Bump versions of some symbols where related structs have been extended.
+  * debian/copyright: Update copyright years
 
- -- Sebastian Ramacher <sramacher@debian.org>  Wed, 21 Feb 2018 20:31:13 +0100
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 21 Feb 2018 20:59:20 +0100
 
 libva (2.0.0-2) unstable; urgency=medium
 
@@ -468,7 +477,7 @@ libva (1.0.14-1) unstable; urgency=low
   * debian/patches/remove-unneeded-dep.patch: add Dep-5 Headers
   * refresh patches
   * remove debian/patches/fix-warnings.patch, applied upstream
-  
+
  -- Reinhard Tartler <siretart@tauware.de>  Mon, 31 Oct 2011 20:11:38 +0100
 
 libva (1.0.12-2) unstable; urgency=low
@@ -482,7 +491,7 @@ libva (1.0.12-1) unstable; urgency=low
 
   * New upstream release.
   * bump shlibs to tightend dependencies of i965-va-driver (Closes: #613332)
-  
+
  -- Reinhard Tartler <siretart@tauware.de>  Sun, 03 Apr 2011 21:16:01 +0200
 
 libva (1.0.8-3) unstable; urgency=low
@@ -524,7 +533,7 @@ libva (1.0.7-1) experimental; urgency=low
   * Force upgrade of vlc to avoid errors while loading libva
     (Closes: #603612)
   * Switch to Format 3.0 (quilt)
-  
+
  -- Reinhard Tartler <siretart@tauware.de>  Sun, 09 Jan 2011 16:46:57 +0100
 
 libva (1.0.4-1) experimental; urgency=low
