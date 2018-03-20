@@ -153,7 +153,7 @@ Multi-Arch: same
 Depends:
  ${misc:Depends},
  i965-va-driver | i965-va-driver-shaders [any-amd64 any-i386],
- mesa-va-drivers | vdpau-va-driver
+ mesa-va-drivers
 Suggests:
  libfglrx-amdxvba1 [amd64 i386]
 Description: Video Acceleration (VA) API -- driver metapackage
