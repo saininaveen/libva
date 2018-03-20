@@ -1,3 +1,11 @@
+libva (2.1.0-2) unstable; urgency=medium
+
+  * debian/control:
+    - Add alternative depends on non-free i965 driver.
+    - No longer depend on old vdpau-based driver.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Tue, 20 Mar 2018 21:27:17 +0100
+
 libva (2.1.0-1) unstable; urgency=medium
 
   [ Ondřej Nový ]
