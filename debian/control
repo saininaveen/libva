@@ -152,7 +152,7 @@ Section: video
 Multi-Arch: same
 Depends:
  ${misc:Depends},
- i965-va-driver | i965-va-driver-shaders [any-amd64 any-i386],
+ i965-va-driver [any-amd64 any-i386] | i965-va-driver-shaders [any-amd64 any-i386],
  mesa-va-drivers
 Suggests:
  libfglrx-amdxvba1 [amd64 i386]
