@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Debian Multimedia Maintainers <debian-multimedia@lists.debian.org>
 Uploaders:
  Reinhard Tartler <siretart@tauware.de>,
- Matteo F. Vescovi <mfv@debian.org>,
  Sebastian Ramacher <sramacher@debian.org>
 Build-Depends:
  debhelper (>= 11),
