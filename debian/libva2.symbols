@@ -47,10 +47,10 @@ libva.so.2 libva2 #MINVER#
  vaMaxNumImageFormats@Base 1.0.3
  vaMaxNumProfiles@Base 1.0.3
  vaMaxNumSubpictureFormats@Base 1.0.3
- vaProfileStr@Base 2.0.0
+ vaProfileStr@Base 2.2.0
  vaPutImage@Base 1.0.3
  vaQueryConfigAttributes@Base 2.1.0
- vaQueryConfigEntrypoints@Base 2.1.0
+ vaQueryConfigEntrypoints@Base 2.2.0
  vaQueryConfigProfiles@Base 1.7.0
  vaQueryDisplayAttributes@Base 1.0.3
  vaQueryImageFormats@Base 1.0.3
