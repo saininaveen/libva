@@ -1,4 +1,4 @@
-libva (2.2.0-1) UNRELEASED; urgency=medium
+libva (2.2.0-1) unstable; urgency=medium
 
   [ Felipe Sateler ]
   * Change maintainer address to debian-multimedia@lists.debian.org
@@ -8,8 +8,14 @@ libva (2.2.0-1) UNRELEASED; urgency=medium
 
   [ Sebastian Ramacher ]
   * New upstream release.
+  * debian/control:
+    - Bump Standards-Version.
+    - Add Provides for new ABI version.
+    - Remove old Pre-Depends.
+  * debian/: Update upstream URL.
+  * debian/libva2.symbols: Bump symbol versions for new profiles.
 
- -- Sebastian Ramacher <sramacher@debian.org>  Mon, 16 Jul 2018 20:32:52 +0200
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 16 Jul 2018 20:40:41 +0200
 
 libva (2.1.0-3) unstable; urgency=medium
 
@@ -634,4 +640,3 @@ libva (0.20~~-1) unstable; urgency=low
   * Initial release of libva
 
  -- Waldo Bastian <waldo.bastian@intel.com>  Mon, 18 Jun 2007 21:35:31 -0700
-
