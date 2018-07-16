@@ -171,34 +171,35 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 libva_drm_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_drm_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libva_drm_la_CFLAGS) \
+	$(CFLAGS) $(libva_drm_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_DRM_TRUE@am_libva_drm_la_rpath = -rpath $(libdir)
 am_libva_glx_la_OBJECTS =
 libva_glx_la_OBJECTS = $(am_libva_glx_la_OBJECTS)
 libva_glx_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_glx_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libva_glx_la_CFLAGS) \
+	$(CFLAGS) $(libva_glx_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_GLX_TRUE@am_libva_glx_la_rpath = -rpath $(libdir)
 am_libva_wayland_la_OBJECTS =
 libva_wayland_la_OBJECTS = $(am_libva_wayland_la_OBJECTS)
 libva_wayland_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libva_wayland_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
+	$(libva_wayland_la_CFLAGS) $(CFLAGS) \
+	$(libva_wayland_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_WAYLAND_TRUE@am_libva_wayland_la_rpath = -rpath $(libdir)
 am_libva_x11_la_OBJECTS =
 libva_x11_la_OBJECTS = $(am_libva_x11_la_OBJECTS)
 libva_x11_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_x11_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libva_x11_la_CFLAGS) \
+	$(CFLAGS) $(libva_x11_la_LDFLAGS) $(LDFLAGS) -o $@
 @USE_X11_TRUE@am_libva_x11_la_rpath = -rpath $(libdir)
-am__objects_1 = va.lo va_compat.lo va_fool.lo va_str.lo va_trace.lo
+am__objects_1 = libva_la-va.lo libva_la-va_compat.lo \
+	libva_la-va_fool.lo libva_la-va_str.lo libva_la-va_trace.lo
 am_libva_la_OBJECTS = $(am__objects_1)
 libva_la_OBJECTS = $(am_libva_la_OBJECTS)
 libva_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libva_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libva_la_CFLAGS) \
+	$(CFLAGS) $(libva_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -498,34 +499,44 @@ libva_ldflags = \
 	-Wl,-version-script,${srcdir}/libva.syms \
 	$(NULL)
 
+libva_cflags = \
+	-Wall			\
+	-fstack-protector	\
+	$(NULL)
+
 lib_LTLIBRARIES = libva.la $(am__append_2) $(am__append_4) \
 	$(am__append_7) $(am__append_9)
 libvaincludedir = ${includedir}/va
 libvainclude_HEADERS = $(libva_source_h)
 noinst_HEADERS = $(libva_source_h_priv)
 libva_la_SOURCES = $(libva_source_c)
+libva_la_CFLAGS = $(libva_cflags)
 libva_la_LDFLAGS = $(libva_ldflags)
 libva_la_DEPENDENCIES = libva.syms
 libva_la_LIBADD = $(LIBVA_LIBS) -ldl
 @USE_DRM_TRUE@libva_drm_la_SOURCES = 
+@USE_DRM_TRUE@libva_drm_la_CFLAGS = $(libva_cflags)
 @USE_DRM_TRUE@libva_drm_la_LDFLAGS = $(LDADD)
 @USE_DRM_TRUE@libva_drm_la_DEPENDENCIES = libva.la drm/libva_drm.la
 @USE_DRM_TRUE@libva_drm_la_LIBADD = libva.la drm/libva_drm.la \
 @USE_DRM_TRUE@	$(LIBVA_LIBS) $(DRM_LIBS) -ldl
 
 @USE_X11_TRUE@libva_x11_la_SOURCES = 
+@USE_X11_TRUE@libva_x11_la_CFLAGS = $(libva_cflags)
 @USE_X11_TRUE@libva_x11_la_LDFLAGS = $(LDADD)
 @USE_X11_TRUE@libva_x11_la_DEPENDENCIES = libva.la x11/libva_x11.la
 @USE_X11_TRUE@libva_x11_la_LIBADD = libva.la x11/libva_x11.la \
 @USE_X11_TRUE@	$(LIBVA_LIBS) $(X11_LIBS) $(XEXT_LIBS) $(XFIXES_LIBS) $(DRM_LIBS) -ldl
 
 @USE_GLX_TRUE@libva_glx_la_SOURCES = 
+@USE_GLX_TRUE@libva_glx_la_CFLAGS = $(libva_cflags)
 @USE_GLX_TRUE@libva_glx_la_LDFLAGS = $(LDADD)
 @USE_GLX_TRUE@libva_glx_la_DEPENDENCIES = libva.la glx/libva_glx.la libva-x11.la
 @USE_GLX_TRUE@libva_glx_la_LIBADD = libva.la glx/libva_glx.la libva-x11.la \
 @USE_GLX_TRUE@	$(GLX_LIBS) -ldl
 
 @USE_WAYLAND_TRUE@libva_wayland_la_SOURCES = 
+@USE_WAYLAND_TRUE@libva_wayland_la_CFLAGS = $(libva_cflags)
 @USE_WAYLAND_TRUE@libva_wayland_la_LDFLAGS = $(LDADD)
 @USE_WAYLAND_TRUE@libva_wayland_la_DEPENDENCIES = libva.la wayland/libva_wayland.la
 @USE_WAYLAND_TRUE@libva_wayland_la_LIBADD = libva.la wayland/libva_wayland.la \
@@ -633,11 +644,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_compat.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_fool.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_str.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/va_trace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libva_la-va.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libva_la-va_compat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libva_la-va_fool.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libva_la-va_str.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libva_la-va_trace.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -659,6 +670,41 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+libva_la-va.lo: va.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -MT libva_la-va.lo -MD -MP -MF $(DEPDIR)/libva_la-va.Tpo -c -o libva_la-va.lo `test -f 'va.c' || echo '$(srcdir)/'`va.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libva_la-va.Tpo $(DEPDIR)/libva_la-va.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='va.c' object='libva_la-va.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -c -o libva_la-va.lo `test -f 'va.c' || echo '$(srcdir)/'`va.c
+
+libva_la-va_compat.lo: va_compat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -MT libva_la-va_compat.lo -MD -MP -MF $(DEPDIR)/libva_la-va_compat.Tpo -c -o libva_la-va_compat.lo `test -f 'va_compat.c' || echo '$(srcdir)/'`va_compat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libva_la-va_compat.Tpo $(DEPDIR)/libva_la-va_compat.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='va_compat.c' object='libva_la-va_compat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -c -o libva_la-va_compat.lo `test -f 'va_compat.c' || echo '$(srcdir)/'`va_compat.c
+
+libva_la-va_fool.lo: va_fool.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -MT libva_la-va_fool.lo -MD -MP -MF $(DEPDIR)/libva_la-va_fool.Tpo -c -o libva_la-va_fool.lo `test -f 'va_fool.c' || echo '$(srcdir)/'`va_fool.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libva_la-va_fool.Tpo $(DEPDIR)/libva_la-va_fool.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='va_fool.c' object='libva_la-va_fool.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -c -o libva_la-va_fool.lo `test -f 'va_fool.c' || echo '$(srcdir)/'`va_fool.c
+
+libva_la-va_str.lo: va_str.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -MT libva_la-va_str.lo -MD -MP -MF $(DEPDIR)/libva_la-va_str.Tpo -c -o libva_la-va_str.lo `test -f 'va_str.c' || echo '$(srcdir)/'`va_str.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libva_la-va_str.Tpo $(DEPDIR)/libva_la-va_str.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='va_str.c' object='libva_la-va_str.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -c -o libva_la-va_str.lo `test -f 'va_str.c' || echo '$(srcdir)/'`va_str.c
+
+libva_la-va_trace.lo: va_trace.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -MT libva_la-va_trace.lo -MD -MP -MF $(DEPDIR)/libva_la-va_trace.Tpo -c -o libva_la-va_trace.lo `test -f 'va_trace.c' || echo '$(srcdir)/'`va_trace.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libva_la-va_trace.Tpo $(DEPDIR)/libva_la-va_trace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='va_trace.c' object='libva_la-va_trace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libva_la_CFLAGS) $(CFLAGS) -c -o libva_la-va_trace.lo `test -f 'va_trace.c' || echo '$(srcdir)/'`va_trace.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -402,6 +402,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 int minor;
             } compatible_versions[] = {
                 { VA_MAJOR_VERSION, VA_MINOR_VERSION },
+                { VA_MAJOR_VERSION, 1 },
                 { VA_MAJOR_VERSION, 0 },
                 { -1, }
             };
@@ -594,6 +595,8 @@ const char *vaErrorStr(VAStatus error_status)
             return "HW busy now";
         case VA_STATUS_ERROR_UNSUPPORTED_MEMORY_TYPE:
             return "an unsupported memory type was supplied";
+        case VA_STATUS_ERROR_NOT_ENOUGH_BUFFER:
+            return "allocated memory size is not enough for input or output";
         case VA_STATUS_ERROR_UNKNOWN:
             return "unknown libva error";
     }

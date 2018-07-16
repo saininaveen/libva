@@ -27,7 +27,7 @@
 # - reset micro version to zero when minor version is incremented
 # - reset minor version to zero when major version is incremented
 m4_define([va_api_major_version], [1])
-m4_define([va_api_minor_version], [1])
+m4_define([va_api_minor_version], [2])
 m4_define([va_api_micro_version], [0])
 
 m4_define([va_api_version],
@@ -84,9 +84,9 @@ m4_define([wayland_api_version], [1.11.0])
 AC_PREREQ(2.57)
 AC_INIT([libva],
         [libva_version],
-        [https://github.com/01org/libva/issues/new],
+        [https://github.com/intel/libva/issues/new],
         [libva],
-        [https://github.com/01org/libva])
+        [https://github.com/intel/libva])
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_MACRO_DIR([m4])
