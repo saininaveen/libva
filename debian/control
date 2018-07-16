@@ -48,7 +48,6 @@ Description: Video Acceleration (VA) API for Linux -- development files
 Package: libva2
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
@@ -73,7 +72,6 @@ Description: Video Acceleration (VA) API for Linux -- runtime
 Package: libva-x11-2
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
@@ -92,7 +90,6 @@ Description: Video Acceleration (VA) API for Linux -- X11 runtime
 Package: libva-glx2
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
@@ -111,7 +108,6 @@ Description: Video Acceleration (VA) API for Linux -- GLX runtime
 Package: libva-drm2
 Architecture: any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
@@ -130,7 +126,6 @@ Description: Video Acceleration (VA) API for Linux -- DRM runtime
 Package: libva-wayland2
 Architecture: linux-any
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
