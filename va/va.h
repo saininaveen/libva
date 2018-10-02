@@ -820,6 +820,23 @@ typedef struct _VAConfigAttrib {
  *  simultaneously. And BRC would adjust accordingly. This is so called
  *  Parallel BRC. */
 #define VA_RC_PARALLEL                  0x00000200
+/** \brief Quality defined VBR
+ * Use Quality factor to determine the good enough QP for each MB such that
+ * good enough quality can be obtained without waste of bits
+ * for this BRC mode, you must set all legacy VBR parameters
+ * and reuse quality_factor in \c VAEncMiscParameterRateControl
+ * */
+#define VA_RC_QVBR                      0x00000400
+/** \brief Average VBR
+ *  Average variable bitrate control algorithm focuses on overall encoding
+ *  quality while meeting the specified target bitrate, within the accuracy
+ *  range, after a convergence period.
+ *  bits_per_second in VAEncMiscParameterRateControl is target bitrate for AVBR.
+ *  Convergence is specified in the unit of frame.
+ *  window_size in VAEncMiscParameterRateControl is equal to convergence for AVBR.
+ *  Accuracy is in the range of [1,100], 1 means one percent, and so on. 
+ *  target_percentage in VAEncMiscParameterRateControl is equal to accuracy for AVBR. */
+#define VA_RC_AVBR                      0x00000800
 
 /**@}*/
 
@@ -1633,6 +1650,19 @@ typedef enum
     /** decode stream out buffer, intermedia data of decode, it may include MV, MB mode etc.
       * it can be used to detect motion and analyze the frame contain  */
     VADecodeStreamoutBufferType             = 56,
+
+    /** \brief HEVC Decoding Subset Parameter buffer type
+     *
+     * The subsets parameter buffer is concatenation with one or multiple
+     * subset entry point offsets. All the offset values are layed out one
+     * by one according to slice order with first slice segment first, second
+     * slice segment second, etc... The entry number is indicated by parameter
+     * \ref num_entry_point_offsets. And the first entry position of the entry
+     * point offsets for any slice segment is indicated by parameter
+     * entry_offset_to_subset_array in VAPictureParameterBufferHEVC data structure.
+     */
+    VASubsetsParameterBufferType        = 57,
+
     VABufferTypeMax
 } VABufferType;
 
@@ -1718,6 +1748,8 @@ typedef enum
     VAEncMiscParameterTypeSkipFrame     = 9,
     /** \brief Buffer type used for region-of-interest (ROI) parameters. */
     VAEncMiscParameterTypeROI           = 10,
+    /** \brief Buffer type used to express a maximum frame size (in bytes) settings for multiple pass. */
+    VAEncMiscParameterTypeMultiPassFrameSize       = 11,
     /** \brief Buffer type used for temporal layer structure */
     VAEncMiscParameterTypeTemporalLayerStructure   = 12,
     /** \brief Buffer type used for dirty region-of-interest (ROI) parameters. */
@@ -1907,6 +1939,7 @@ typedef struct _VAEncMiscParameterRateControl
     /** Initial quality factor used in ICQ mode.
      *
      * This value must be between 1 and 51.
+     * this value will be deprecated in future, to use quality_factor instead of it.
      */
     uint32_t ICQ_quality_factor;
     /** Maximum quantiser value to use.
@@ -1915,8 +1948,13 @@ typedef struct _VAEncMiscParameterRateControl
      * may exceed the target.  Ignored if set to zero.
      */
     uint32_t max_qp;
+    /** Quality factor
+     *
+     *  the range will be different for different codec
+     */
+    uint32_t quality_factor;
     /** Reserved bytes for future use, must be zero. */
-    uint32_t va_reserved[VA_PADDING_MEDIUM - 2];
+    uint32_t va_reserved[VA_PADDING_MEDIUM - 3];
 } VAEncMiscParameterRateControl;
 
 /** Encode framerate parameters.
@@ -2078,6 +2116,31 @@ typedef struct _VAEncMiscParameterBufferMaxFrameSize {
     /** \brief Reserved bytes for future use, must be zero */
     uint32_t                va_reserved[VA_PADDING_LOW];
 } VAEncMiscParameterBufferMaxFrameSize;
+
+/**
+ * \brief Maximum frame size (in bytes) settings for multiple pass.
+ *
+ * This misc parameter buffer defines the maximum size of a frame (in
+ * bytes) settings for multiple pass. currently only AVC encoder can
+ * support this settings in multiple pass case. If the frame size exceeds
+ * this size, the encoder will do more pak passes to adjust the QP value
+ * to control the frame size.
+ */
+typedef struct _VAEncMiscParameterBufferMultiPassFrameSize {
+    /** \brief Type. Shall be set to #VAEncMiscParameterTypeMultiPassMaxFrameSize. */
+    VAEncMiscParameterType      type;
+    /** \brief Maximum size of a frame (in byte) */
+    uint32_t                max_frame_size;
+    /** \brief Reserved bytes for future use, must be zero */
+    uint32_t                reserved;
+    /** \brief number of passes, every pass has different QP, currently AVC encoder can support up to 4 passes */
+    uint8_t                 num_passes;
+    /** \brief delta QP list for every pass */
+    uint8_t                *delta_qp;
+
+    /** \brief Reserved bytes for future use, must be zero */
+    unsigned long           va_reserved[VA_PADDING_LOW];
+} VAEncMiscParameterBufferMultiPassFrameSize;
 
 /**
  * \brief Encoding quality level.
