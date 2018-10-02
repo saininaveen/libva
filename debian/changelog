@@ -1,3 +1,10 @@
+libva (2.3.0-2) unstable; urgency=medium
+
+  * watch: Updated.
+  * control: Add Provides for new ABI version.
+
+ -- Timo Aaltonen <tjaalton@debian.org>  Tue, 02 Oct 2018 13:10:11 +0300
+
 libva (2.3.0-1) unstable; urgency=medium
 
   * New upstream release.
