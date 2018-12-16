@@ -149,6 +149,7 @@ Multi-Arch: same
 Depends:
  ${misc:Depends},
  i965-va-driver [any-amd64 any-i386] | i965-va-driver-shaders [any-amd64 any-i386],
+ intel-media-va-driver [amd64 i386 x32] | intel-media-va-driver-non-free [amd64 i386 x32],
  mesa-va-drivers
 Description: Video Acceleration (VA) API -- driver metapackage
  This package depends on the full suite of drivers for the Video Acceleration
