@@ -1,3 +1,14 @@
+libva (2.4.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/control:
+    - Bump Standards-Version.
+    - Add intel-media-driver to va-driver-all.
+    - Set Rules-Requires-Root: no.
+    - Add provides for new driver ABI.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 28 Jan 2019 21:47:15 +0100
+
 libva (2.3.0-2) unstable; urgency=medium
 
   * watch: Updated.
