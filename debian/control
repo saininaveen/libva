@@ -19,6 +19,7 @@ Standards-Version: 4.3.0
 Homepage: https://01.org/linuxmedia/vaapi
 Vcs-Git: https://salsa.debian.org/multimedia-team/libva.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/libva
+Rules-Requires-Root: no
 
 Package: libva-dev
 Section: libdevel
