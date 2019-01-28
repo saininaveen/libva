@@ -185,7 +185,7 @@ struct va_trace {
 #define DPY2TRACECTX(dpy, context, buf_id)                                  \
     struct va_trace *pva_trace = NULL;                                      \
     struct trace_context *trace_ctx = NULL;                                 \
-    int ctx_id = context;                                                   \
+    VAContextID ctx_id = context;                                           \
                                                                             \
     pva_trace = (struct va_trace *)(((VADisplayContextP)dpy)->vatrace);     \
     if(!pva_trace)                                                          \
@@ -955,6 +955,7 @@ static void va_TraceSurface(VADisplay dpy, VAContextID context)
     unsigned int buffer_name;
     void *buffer = NULL;
     unsigned char *Y_data, *UV_data, *tmp;
+    unsigned int pixel_byte;
     VAStatus va_status;
     DPY2TRACECTX(dpy, context, VA_INVALID_ID);
 
@@ -1001,20 +1002,27 @@ static void va_TraceSurface(VADisplay dpy, VAContextID context)
     Y_data = (unsigned char*)buffer;
     UV_data = (unsigned char*)buffer + chroma_u_offset;
 
+    if (fourcc == VA_FOURCC_P010)
+        pixel_byte = 2;
+    else
+        pixel_byte = 1;
+
     tmp = Y_data + luma_stride * trace_ctx->trace_surface_yoff;
+
     for (i=0; i<trace_ctx->trace_surface_height; i++) {
         fwrite(tmp + trace_ctx->trace_surface_xoff,
                trace_ctx->trace_surface_width,
-               1, trace_ctx->trace_fp_surface);
+               pixel_byte, trace_ctx->trace_fp_surface);
         
         tmp += luma_stride;
     }
+
     tmp = UV_data + chroma_u_stride * trace_ctx->trace_surface_yoff / 2;
-    if (fourcc == VA_FOURCC_NV12) {
+    if (fourcc == VA_FOURCC_NV12 || fourcc == VA_FOURCC_P010) {
         for (i=0; i<trace_ctx->trace_surface_height/2; i++) {
             fwrite(tmp + trace_ctx->trace_surface_xoff,
                    trace_ctx->trace_surface_width,
-                   1, trace_ctx->trace_fp_surface);
+                   pixel_byte, trace_ctx->trace_fp_surface);
             
             tmp += chroma_u_stride;
         }
@@ -1134,7 +1142,7 @@ static void va_TraceSurfaceAttributes(
             va_TraceMsg(trace_ctx, "\t\tvalue.value.p = %p\n", p->value.value.p);
             if ((p->type == VASurfaceAttribExternalBufferDescriptor) && p->value.value.p) {
                 VASurfaceAttribExternalBuffers *tmp = (VASurfaceAttribExternalBuffers *) p->value.value.p;
-                int j;
+                uint32_t j;
                 
                 va_TraceMsg(trace_ctx, "\t\t--VASurfaceAttribExternalBufferDescriptor\n");
                 va_TraceMsg(trace_ctx, "\t\t  pixel_format=0x%08x\n", tmp->pixel_format);
@@ -4629,7 +4637,7 @@ va_TraceProcFilterParameterBuffer(
     unsigned int size;
     unsigned int num_elements;
     VAProcFilterParameterBufferBase *base_filter = NULL;
-    int i;
+    unsigned int i;
 
     DPY2TRACECTX(dpy, context, VA_INVALID_ID);
 
@@ -4694,7 +4702,7 @@ va_TraceVAProcPipelineParameterBuffer(
 )
 {
     VAProcPipelineParameterBuffer *p = (VAProcPipelineParameterBuffer *)data;
-    int i;
+    uint32_t i;
 
     DPY2TRACECTX(dpy, context, VA_INVALID_ID);
 
