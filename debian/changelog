@@ -1,3 +1,10 @@
+libva (2.4.1-1) experimental; urgency=medium
+
+  * New upstream release.
+  * debian/: Bump debhelper compat to 12.
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 10 Apr 2019 20:10:20 +0200
+
 libva (2.4.0-1) unstable; urgency=medium
 
   * New upstream release.
