@@ -73,6 +73,7 @@ libva.so.2 libva2 #MINVER#
  vaSetSubpictureChromakey@Base 1.0.3
  vaSetSubpictureGlobalAlpha@Base 1.0.3
  vaSetSubpictureImage@Base 1.0.3
+ vaStatusStr@Base 2.5.0
  vaSyncSurface@Base 1.0.3
  vaTerminate@Base 1.0.3
  vaUnlockSurface@Base 2.0.0
@@ -85,6 +86,7 @@ libva.so.2 libva2 #MINVER#
  va_FoolInit@Base 2.0.0
  va_FoolMapBuffer@Base 2.0.0
  (optional|internal)va_TracePutSurface@Base 1.0.6
+ va_TraceStatus@Base 2.5.0
  va_errorMessage@Base 2.0.0
  va_fool_codec@Base 2.0.0
  va_fool_postp@Base 2.0.0
