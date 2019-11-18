@@ -34,6 +34,8 @@ Depends:
  libwayland-dev (>= 1.0.0) [linux-any],
  ${misc:Depends},
  libset-scalar-perl
+Provides:
+ dh-sequence-libva
 Description: Video Acceleration (VA) API for Linux -- development files
  Video Acceleration API (VA API) is a library ("libVA") and API specification
  which enables and provides access to graphics hardware (GPU) acceleration for
