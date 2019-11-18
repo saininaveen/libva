@@ -1,3 +1,13 @@
+libva (2.5.0-2) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * Bump Standards-Version to 4.4.1
+
+  [ Sebastian Ramacher ]
+  * debian/control: Provide dh-sequence-libva
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Mon, 18 Nov 2019 21:33:30 +0100
+
 libva (2.5.0-1) unstable; urgency=medium
 
   * New upstream release.
