@@ -15,7 +15,7 @@ Build-Depends:
  libxfixes-dev,
  pkg-config,
  perl:any
-Standards-Version: 4.4.1
+Standards-Version: 4.5.0
 Homepage: https://01.org/linuxmedia/vaapi
 Vcs-Git: https://salsa.debian.org/multimedia-team/libva.git
 Vcs-Browser: https://salsa.debian.org/multimedia-team/libva
