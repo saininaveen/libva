@@ -378,7 +378,7 @@ static VAStatus va_getDriverNameByIndex(VADisplay dpy, char **driver_name, int c
             status = pDisplayContext->vaGetDriverName(pDisplayContext, driver_name);
         else
             status = VA_STATUS_ERROR_INVALID_PARAMETER;
-    }    
+    }
     driver_name_env = getenv("LIBVA_DRIVER_NAME");
     /*if user set driver name by vaSetDriverName */
     if (ctx->override_driver_name){
@@ -398,7 +398,7 @@ static VAStatus va_getDriverNameByIndex(VADisplay dpy, char **driver_name, int c
         *driver_name = strdup(driver_name_env);
         va_infoMessage(dpy, "User environment variable requested driver '%s'\n", *driver_name);
         return VA_STATUS_SUCCESS;
-    } 
+    }
     return status;
 }
 
@@ -470,6 +470,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
                 int minor;
             } compatible_versions[] = {
                 { VA_MAJOR_VERSION, VA_MINOR_VERSION },
+                { VA_MAJOR_VERSION, 6 },
                 { VA_MAJOR_VERSION, 5 },
                 { VA_MAJOR_VERSION, 4 },
                 { VA_MAJOR_VERSION, 3 },
@@ -744,7 +745,7 @@ VAStatus vaInitialize (
         if (vaStatus == VA_STATUS_SUCCESS) {
             break;
        }
-        
+
     }
 
     *major_version = VA_MAJOR_VERSION;
