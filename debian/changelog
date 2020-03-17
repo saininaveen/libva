@@ -1,3 +1,13 @@
+libva (2.7.0~pre1-1) unstable; urgency=medium
+
+  * New upstream pre-release
+    - Fix NULL vtable when querying devices without drivers (Closes: #951778)
+  * debian/control:
+    - Bump Standards-Version
+    - Add provides for new driver ABI
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Tue, 17 Mar 2020 11:45:44 +0100
+
 libva (2.6.1-1) unstable; urgency=medium
 
   * New upstream release
