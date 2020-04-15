@@ -1,3 +1,10 @@
+libva (2.7.0-2) unstable; urgency=medium
+
+  * debian/patches: Apply upstream patch to map iris driver to i965 or iHD
+    (Closes: #955585)
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Wed, 15 Apr 2020 09:55:55 +0200
+
 libva (2.7.0-1) unstable; urgency=medium
 
   * New upstream release
