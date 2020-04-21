@@ -1,3 +1,10 @@
+libva (2.7.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/patches: Remove patches integrated upstream
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Tue, 21 Apr 2020 22:17:01 +0200
+
 libva (2.7.0-2) unstable; urgency=medium
 
   * debian/patches: Apply upstream patch to map iris driver to i965 or iHD
