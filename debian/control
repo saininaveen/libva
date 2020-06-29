@@ -6,7 +6,7 @@ Uploaders:
  Reinhard Tartler <siretart@tauware.de>,
  Sebastian Ramacher <sramacher@debian.org>
 Build-Depends:
- debhelper-compat (= 12),
+ debhelper-compat (= 13),
  libdrm-dev,
  libgl1-mesa-dev | libgl-dev,
  libwayland-dev (>= 1.0.0) [linux-any],
