@@ -74,6 +74,8 @@ libva.so.2 libva2 #MINVER#
  vaSetSubpictureGlobalAlpha@Base 1.0.3
  vaSetSubpictureImage@Base 1.0.3
  vaStatusStr@Base 2.5.0
+ vaSyncBuffer@Base 2.9.0
+ vaSyncSurface2@Base 2.9.0
  vaSyncSurface@Base 1.0.3
  vaTerminate@Base 1.0.3
  vaUnlockSurface@Base 2.0.0
