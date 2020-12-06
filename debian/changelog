@@ -1,3 +1,13 @@
+libva (2.10.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * debian/control:
+    - Provide new driver ABI
+    - Bump Standards-Version
+  * debian/libva2.symbols: Add new symbol
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 06 Dec 2020 16:55:03 +0100
+
 libva (2.9.0-1) unstable; urgency=medium
 
   * New upstream release
