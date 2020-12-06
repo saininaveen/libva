@@ -9,6 +9,7 @@ libva.so.2 libva2 #MINVER#
  vaBufferSetNumElements@Base 1.0.3
  vaBufferTypeStr@Base 2.1.0
  vaConfigAttribTypeStr@Base 2.1.0
+ vaCopy@Base 2.10.0
  vaCreateBuffer2@Base 2.1.0
  vaCreateBuffer@Base 1.7.1
  vaCreateConfig@Base 1.7.3
