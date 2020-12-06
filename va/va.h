@@ -130,6 +130,93 @@ extern "C" {
  * 	- \ref api_fei
  * 	- \ref api_fei_h264
  * 	- \ref api_fei_hevc
+ * 
+ * \section threading Multithreading Guide
+ * All VAAPI functions implemented in libva are thread-safe. For any VAAPI
+ * function that requires the implementation of a backend (e.g. hardware driver),
+ * the backend must ensure that its implementation is also thread-safe. If the
+ * backend implementation of a VAAPI function is not thread-safe then this should
+ * be considered as a bug against the backend implementation. 
+ *
+ * It is assumed that none of the VAAPI functions will be called from signal 
+ * handlers.
+ *
+ * Thread-safety in this context means that when VAAPI is being called by multiple
+ * concurrent threads, it will not crash or hang the OS, and VAAPI internal
+ * data structures will not be corrupted. When multiple threads are operating on
+ * the same VAAPI objects, it is the application's responsibility to synchronize
+ * these operations in order to generate the expected results. For example, using
+ * a single VAContext from multiple threads may generate unexpected results.
+ *
+ * Following pseudo code illustrates a multithreaded transcoding scenario, where
+ * one thread is handling the decoding operation and another thread is handling 
+ * the encoding operation, while synchronizing the use of a common pool of
+ * surfaces.
+ *
+ * // Initialization
+ * dpy = vaGetDisplayDRM(fd);
+ * vaInitialize(dpy, ...); 
+ *
+ * // Create surfaces required for decoding and subsequence encoding
+ * vaCreateSurfaces(dpy, VA_RT_FORMAT_YUV420, width, height, &surfaces[0], ...);
+ *
+ * // Set up a queue for the surfaces shared between decode and encode threads
+ * surface_queue = queue_create();
+ *
+ * // Create decode_thread
+ * pthread_create(&decode_thread, NULL, decode, ...);
+ *
+ * // Create encode_thread
+ * pthread_create(&encode_thread, NULL, encode, ...);
+ *
+ * // Decode thread function
+ * decode() {
+ *   // Find the decode entrypoint for H.264 
+ *   vaQueryConfigEntrypoints(dpy, h264_profile, entrypoints, ...);
+ *
+ *   // Create a config for H.264 decode
+ *   vaCreateConfig(dpy, h264_profile, VAEntrypointVLD, ...);
+ *
+ *   // Create a context for decode
+ *   vaCreateContext(dpy, config, width, height, VA_PROGRESSIVE, surfaces, 
+ *     num_surfaces, &decode_context); 
+ *
+ *   // Decode frames in the bitstream
+ *   for (;;) {
+ *     // Parse one frame and decode 
+ *     vaBeginPicture(dpy, decode_context, surfaces[surface_index]); 
+ *     vaRenderPicture(dpy, decode_context, buf, ...);
+ *     vaEndPicture(dpy, decode_context);
+ *     // Poll the decoding status and enqueue the surface in display order after 
+ *     // decoding is complete
+ *     vaQuerySurfaceStatus();
+ *     enqueue(surface_queue, surface_index);
+ *   }
+ * }
+ *
+ * // Encode thread function
+ * encode() {
+ *   // Find the encode entrypoint for HEVC
+ *   vaQueryConfigEntrypoints(dpy, hevc_profile, entrypoints, ...);
+ *
+ *   // Create a config for HEVC encode
+ *   vaCreateConfig(dpy, hevc_profile, VAEntrypointEncSlice, ...);
+ *
+ *   // Create a context for encode
+ *   vaCreateContext(dpy, config, width, height, VA_PROGRESSIVE, surfaces,
+ *     num_surfaces, &encode_context); 
+ *
+ *   // Encode frames produced by the decoder
+ *   for (;;) {
+ *     // Dequeue the surface enqueued by the decoder    
+ *     surface_index = dequeue(surface_queue);
+ *     // Encode using this surface as the source
+ *     vaBeginPicture(dpy, encode_context, surfaces[surface_index]);
+ *     vaRenderPicture(dpy, encode_context, buf, ...);
+ *     vaEndPicture(dpy, encode_context);
+ *   }
+ * }
+ *
  */
 
 /**
@@ -270,6 +357,17 @@ typedef int VAStatus;	/** Return status type from functions */
 #define VA_PADDING_MEDIUM       8
 #define VA_PADDING_HIGH         16
 #define VA_PADDING_LARGE        32
+
+/** operation options */
+/** synchronization, block call, output should be ready after execution function return*/ 
+#define VA_EXEC_SYNC              0x0
+/** asynchronization,application should call additonal sync operation to access output */
+#define VA_EXEC_ASYNC             0x1
+
+/** operation mode */
+#define VA_EXEC_MODE_DEFAULT      0x0
+#define VA_EXEC_MODE_POWER_SAVING 0x1
+#define VA_EXEC_MODE_PERFORMANCE  0x2
 
 /**
  * Returns a short english description of error_status
@@ -792,6 +890,7 @@ typedef enum
     VAConfigAttribMultipleFrame         = 40,
     /** \brief priority setting for the context. Read-Write
      *  attribute value is \c VAConfigAttribValContextPriority
+     *  this setting also could be update by \c VAContextParameterUpdateBuffer
      */
     VAConfigAttribContextPriority       = 41,
     /**@}*/
@@ -881,8 +980,18 @@ typedef struct _VAConfigAttrib {
  *  Convergence is specified in the unit of frame.
  *  window_size in VAEncMiscParameterRateControl is equal to convergence for AVBR.
  *  Accuracy is in the range of [1,100], 1 means one percent, and so on. 
- *  target_percentage in VAEncMiscParameterRateControl is equal to accuracy for AVBR. */
+ *  target_percentage in VAEncMiscParameterRateControl is equal to accuracy for AVBR.
+ * */
 #define VA_RC_AVBR                      0x00000800
+/** \brief Transport Controlled BRC
+ *  Specific bitrate control for real time streaming.
+ *  TCBRC can instantly react to channel change to remove or significantly reduce the delay.
+ *  Application (transport) provides channel feedback to driver through TargetFrameSize.
+ *  When channel condition is very good (almost no constraint on instant frame size),
+ *  the app should set target frame size as zero. Otherwise, channel capacity divided by fps
+ *  should be used.
+ * */
+#define VA_RC_TCBRC                     0x00001000
 
 /**@}*/
 
@@ -1152,7 +1261,7 @@ typedef union _VAConfigAttribValMultipleFrame {
     uint32_t value;
 }VAConfigAttribValMultipleFrame;
 
-/** brief Attribute value VAConfigAttribValContestPriority */
+/** brief Attribute value VAConfigAttribValContextPriority */
 typedef union _VAConfigAttribValContextPriority{
     struct{
         /** \brief the priority , for the Query operation (read) it represents highest priority
@@ -1775,9 +1884,37 @@ typedef enum
      * entry_offset_to_subset_array in VAPictureParameterBufferHEVC data structure.
      */
     VASubsetsParameterBufferType        = 57,
+    /** \brief adjust context parameters dynamically
+     *
+     * this parameter is used to update context parameters, detail parameter is in
+     *  \c VAContextParameterUpdateBuffer
+     */
+    VAContextParameterUpdateBufferType  = 58,
 
     VABufferTypeMax
 } VABufferType;
+
+/** \brief update the context parameter
+ * this structure is used to update context parameters, such as priority of the context
+ * backend driver should keep the parameter unchanged if there no new
+ * parameter updated.
+ */
+typedef struct _VAContextParameterUpdateBuffer
+{
+    union{
+        struct {
+            /** \brief indicate whether context priority changed */
+            uint32_t context_priority_update :1;
+            /** \brief Reserved bits for future use, must be zero */
+            uint32_t reserved                :31;
+        } bits;
+        uint32_t value;
+    }flags;
+    /** \brief task/context priority */
+    VAConfigAttribValContextPriority context_priority;
+    /** \brief Reserved bytes for future use, must be zero */
+    uint32_t reserved[VA_PADDING_MEDIUM];
+} VAContextParameterUpdateBuffer;
 
 /**
  * Processing rate parameter for encode.
@@ -2066,8 +2203,17 @@ typedef struct _VAEncMiscParameterRateControl
      *  the range will be different for different codec
      */
     uint32_t quality_factor;
+    /** Target frame size
+     *
+     *  Desired frame size in bytes.
+     *  This parameter can be used in some RC modes (like Transport Controlled BRC)
+     *  where feedback from the app is required.
+     *  Zero value means no limits.
+     *
+     */
+    uint32_t target_frame_size;
     /** Reserved bytes for future use, must be zero. */
-    uint32_t va_reserved[VA_PADDING_MEDIUM - 3];
+    uint32_t va_reserved[VA_PADDING_LOW];
 } VAEncMiscParameterRateControl;
 
 /** Encode framerate parameters.
@@ -2547,6 +2693,7 @@ typedef struct _VAEncMiscParameterCustomRoundingControl
         uint32_t    value;
     }   rounding_offset_setting;
 } VAEncMiscParameterCustomRoundingControl;
+
 /**
  * There will be cases where the bitstream buffer will not have enough room to hold
  * the data for the entire slice, and the following flags will be used in the slice
@@ -4741,6 +4888,47 @@ typedef struct _VAPictureHEVC
  * NumPocLtCurr.
  */
 #define VA_PICTURE_HEVC_RPS_LT_CURR             0x00000040
+
+typedef enum{
+    VACopyObjectSurface = 0,
+    VACopyObjectBuffer  = 1,
+} VACopyObjectType;
+
+typedef struct _VACopyObject {
+    VACopyObjectType  obj_type;    // type of object.
+    union
+    {
+        VASurfaceID surface_id;
+        VABufferID  buffer_id;
+    } object;
+
+    uint32_t    va_reserved[VA_PADDING_MEDIUM];
+} VACopyObject;
+
+typedef union _VACopyOption{
+    struct {
+        /** \brief va copy synchronization, the value should be /c VA_EXEC_SYNC or /c VA_EXEC_ASYNC */
+        uint32_t va_copy_sync : 2;
+        /** \brief va copy mode, the value should be VA_EXEC_MODE_XXX */
+        uint32_t va_copy_mode : 4;
+        uint32_t reserved     :26;
+    }bits;
+    uint32_t value;
+}VACopyOption;
+
+/** \brief Copies an object.
+ *
+ * Copies specified object (surface or buffer). If non-blocking copy
+ * is requested (VA_COPY_NONBLOCK), then need vaSyncBuffer or vaSyncSurface/vaSyncSurface2
+ * to sync the destination object.
+ *
+ * @param[in] dpy               the VA display
+ * @param[in] dst               Destination object to copy to
+ * @param[in] src               Source object to copy from
+ * @param[in] option            VA copy option
+ * @return VA_STATUS_SUCCESS if successful
+ */
+VAStatus vaCopy(VADisplay dpy, VACopyObject * dst, VACopyObject * src, VACopyOption option);
 
 #include <va/va_dec_hevc.h>
 #include <va/va_dec_jpeg.h>

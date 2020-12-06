@@ -27,7 +27,7 @@
 # - reset micro version to zero when minor version is incremented
 # - reset minor version to zero when major version is incremented
 m4_define([va_api_major_version], [1])
-m4_define([va_api_minor_version], [9])
+m4_define([va_api_minor_version], [10])
 m4_define([va_api_micro_version], [0])
 
 m4_define([va_api_version],
@@ -208,6 +208,11 @@ if test "$ac_cv_have_gnuc_visibility_attribute" = "yes"; then
     AC_DEFINE([HAVE_GNUC_VISIBILITY_ATTRIBUTE], [1],
               [Defined to 1 if GCC visibility attribute is supported])
 fi
+
+# Check for -ldl (often not required)
+AC_SEARCH_LIBS([dlopen], [dl], [], [
+  AC_MSG_ERROR([unable to find the dlopen() function])
+])
 
 # Check for -fstack-protector
 ssp_cc=yes

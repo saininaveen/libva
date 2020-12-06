@@ -71,7 +71,7 @@ int va_parseConfig(char *env, char *env_value)
     if (env == NULL)
         return 1;
     
-    fp = fopen("/etc/libva.conf", "r");
+    fp = fopen(SYSCONFDIR "/libva.conf", "r");
     while (fp && (fgets(oneline, 1024, fp) != NULL)) {
         if (strlen(oneline) == 1)
             continue;
@@ -451,7 +451,7 @@ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
         }
 
         va_infoMessage(dpy, "Trying to open %s\n", driver_path);
-#ifndef ANDROID
+#if defined(RTLD_NODELETE) && !defined(ANDROID)
         handle = dlopen( driver_path, RTLD_NOW | RTLD_GLOBAL | RTLD_NODELETE );
 #else
         handle = dlopen( driver_path, RTLD_NOW| RTLD_GLOBAL);
@@ -2285,4 +2285,24 @@ vaQueryVideoProcPipelineCaps(
     );
     VA_TRACE_RET(dpy, status);
     return status;
+}
+
+VAStatus
+vaCopy(
+    VADisplay         dpy,
+    VACopyObject      *dst,
+    VACopyObject      *src,
+    VACopyOption      option
+)
+{
+  VAStatus va_status;
+  VADriverContextP ctx;
+  CHECK_DISPLAY(dpy);
+  ctx = CTX(dpy);
+
+  if(ctx->vtable->vaCopy  == NULL)
+      va_status = VA_STATUS_ERROR_UNIMPLEMENTED;
+  else
+      va_status = ctx->vtable->vaCopy( ctx, dst, src, option);
+  return va_status;
 }

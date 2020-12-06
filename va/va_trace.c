@@ -48,11 +48,39 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/syscall.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <errno.h>
+
+#if defined(__linux__)
+#include <sys/syscall.h>
+#elif defined(__DragonFly__) || defined(__FreeBSD__)
+#include <pthread_np.h>
+#elif defined(__NetBSD__)
+#include <lwp.h>
+#elif defined(__sun)
+#include <thread.h>
+#endif
+
+/* bionic, glibc >= 2.30, musl >= 1.3 have gettid(), so add va_ prefix */
+static pid_t va_gettid()
+{
+#if defined(__linux__)
+  return syscall(__NR_gettid);
+#elif defined(__DragonFly__) || defined(__FreeBSD__)
+  return pthread_getthreadid_np();
+#elif defined(__NetBSD__)
+  return _lwp_self();
+#elif defined(__OpenBSD__)
+  return getthrid();
+#elif defined(__sun)
+  return thr_self();
+#else
+#warning "Cannot get kernel thread identifier on this platform."
+  return (intptr_t)pthread_self();
+#endif
+}
 
 /*
  * Env. to debug some issue, e.g. the decode/encode issue in a video conference scenerio:
@@ -288,7 +316,7 @@ static void add_trace_config_info(
 {
     struct trace_config_info *pconfig_info;
     int idx = 0;
-    pid_t thd_id = syscall(__NR_gettid);
+    pid_t thd_id = va_gettid();
 
     LOCK_RESOURCE(pva_trace);
 
@@ -666,7 +694,7 @@ static struct trace_log_file *start_tracing2log_file(
 {
     struct trace_log_files_manager *plog_files_mgr = NULL;
     struct trace_log_file *plog_file = NULL;
-    pid_t thd_id = syscall(__NR_gettid);
+    pid_t thd_id = va_gettid();
     int i = 0;
 
     LOCK_RESOURCE(pva_trace);
@@ -705,7 +733,7 @@ static void refresh_log_file(
     struct trace_context *ptra_ctx)
 {
     struct trace_log_file *plog_file = NULL;
-    pid_t thd_id = syscall(__NR_gettid);
+    pid_t thd_id = va_gettid();
     int i = 0;
 
     plog_file = ptra_ctx->plog_file;
@@ -1231,7 +1259,7 @@ static void internal_TraceUpdateContext (
 {
     struct trace_context *trace_ctx = NULL;
     int i = 0, delete = 1;
-    pid_t thd_id = syscall(__NR_gettid);
+    pid_t thd_id = va_gettid();
 
     if(tra_ctx_idx >= MAX_TRACE_CTX_NUM)
         return;
@@ -4017,7 +4045,6 @@ static void va_TraceVAPictureParameterBufferAV1(
     va_TraceMsg(trace_ctx, "\t\tseq_info_fields.color_range = %d\n", p->seq_info_fields.fields.color_range);
     va_TraceMsg(trace_ctx, "\t\tseq_info_fields.subsampling_x = %d\n", p->seq_info_fields.fields.subsampling_x);
     va_TraceMsg(trace_ctx, "\t\tseq_info_fields.subsampling_y = %d\n", p->seq_info_fields.fields.subsampling_y);
-    va_TraceMsg(trace_ctx, "\t\tseq_info_fields.chroma_sample_position = %d\n", p->seq_info_fields.fields.chroma_sample_position);
     va_TraceMsg(trace_ctx, "\t\tseq_info_fields.film_grain_params_present = %d\n", p->seq_info_fields.fields.film_grain_params_present);
 
     va_TraceMsg(trace_ctx, "\tcurrent_frame = %X\n", p->current_frame);
@@ -4406,9 +4433,6 @@ static void va_TraceVASliceParameterBufferAV1(
 
     va_TraceMsg(trace_ctx, "\ttile_row = %d\n", p->tile_row);
     va_TraceMsg(trace_ctx, "\ttile_column = %d\n", p->tile_column);
-
-    va_TraceMsg(trace_ctx, "\ttg_start = %d\n", p->tg_start);
-    va_TraceMsg(trace_ctx, "\ttg_end = %d\n", p->tg_end);
 
     va_TraceMsg(trace_ctx, "\tanchor_frame_idx = %d\n", p->anchor_frame_idx);
     va_TraceMsg(trace_ctx, "\ttile_idx_in_tile_list = %d\n", p->tile_idx_in_tile_list);
