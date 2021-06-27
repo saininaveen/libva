@@ -371,6 +371,30 @@ typedef int VAStatus;	/** Return status type from functions */
 #define VA_EXEC_MODE_POWER_SAVING 0x1
 #define VA_EXEC_MODE_PERFORMANCE  0x2
 
+/* Values used to describe device features. */
+/** The feature is not supported by the device.
+ *
+ * Any corresponding feature flag must not be set.
+ */
+#define VA_FEATURE_NOT_SUPPORTED  0
+/** The feature is supported by the device.
+ *
+ * The user may decide whether or not to use this feature.
+ *
+ * Note that support for a feature only indicates that the hardware
+ * is able to use it; whether it is actually a positive change to
+ * enable it in a given situation will depend on other factors
+ * including the input provided by the user.
+ */
+#define VA_FEATURE_SUPPORTED      1
+/** The feature is required by the device.
+ *
+ * The device does not support not enabling this feature, so any
+ * corresponding feature flag must be set and any additional
+ * configuration needed by the feature must be supplied.
+ */
+#define VA_FEATURE_REQUIRED       2
+
 /**
  * Returns a short english description of error_status
  */
@@ -956,6 +980,26 @@ typedef enum
      */
     VAConfigAttribProtectedContentUsage = 49,
 
+    /** \brief HEVC/H.265 encoding features.  Read-only.
+     *
+     * This attribute describes the supported features of an
+     * HEVC/H.265 encoder configuration.  The value returned uses the
+     * VAConfigAttribValEncHEVCFeatures type.
+     *
+     * If this attribute is supported by a driver then it must also
+     * support the VAConfigAttribEncHEVCBlockSizes attribute.
+     */
+    VAConfigAttribEncHEVCFeatures       = 50,
+    /** \brief HEVC/H.265 encoding block sizes.  Read-only.
+     *
+     * This attribute describes the supported coding tree and transform
+     * block sizes of an HEVC/H.265 encoder configuration.  The value
+     * returned uses the VAConfigAttribValEncHEVCBlockSizes type.
+     *
+     * If this attribute is supported by a driver then it must also
+     * support the VAConfigAttribEncHEVCFeatures attribute.
+     */
+    VAConfigAttribEncHEVCBlockSizes     = 51,
     /**@}*/
     VAConfigAttribTypeMax
 } VAConfigAttribType;
@@ -1581,6 +1625,13 @@ typedef enum {
     /** \brief Surface usage hint, gives the driver a hint of intended usage 
      *  to optimize allocation (e.g. tiling) (int, read/write). */
     VASurfaceAttribUsageHint,
+    /** \brief List of possible DRM format modifiers (pointer, write).
+     *
+     * The value must be a pointer to a VADRMFormatModifierList. This can only
+     * be used when allocating a new buffer, it's invalid to use this attribute
+     * when importing an existing buffer.
+     */
+    VASurfaceAttribDRMFormatModifiers,
     /** \brief Number of surface attributes. */
     VASurfaceAttribCount
 } VASurfaceAttribType;
@@ -4828,7 +4879,17 @@ VAStatus vaDeassociateSubpicture (
  * brightness etc. in the rendering process.  The application can query what
  * attributes are supported by the driver, and then set the appropriate attributes
  * before calling vaPutSurface()
+ *
+ * Display attributes can also be used to query/set platform or display adaptor (vaDisplay)
+ * related information. These attributes do not depend on vaConfig, and could not be used
+ * for vaPutSurface. Application can use vaQueryDisplayAttributes/vaGetDisplayAttributes
+ * at anytime after vaInitialize, but (for settable attributes) vaSetDisplayAttributes should be
+ * called after vaInitialize and before any other function call.
+ *
+ * To distinguish these two types of display attributes, display adaptor related attributes
+ * should be marked as "HW attribute" in the description.
  */
+
 /* PowerVR IEP Lite attributes */
 typedef enum
 {
@@ -4877,6 +4938,47 @@ typedef enum
 #define VA_RENDER_DEVICE_UNDEFINED  0
 #define VA_RENDER_DEVICE_LOCAL      1
 #define VA_RENDER_DEVICE_EXTERNAL   2
+
+/**\brief sub device info
+ * Sub-device is the concept basing on the "device" behind "vaDisplay".
+ * If a device could be divided to several sub devices, the task of
+ * decode/encode/vpp could be assigned on one sub-device. So, application
+ * could choose the sub device before any other operations. After that,
+ * all of the task execution/resource allocation will be dispatched to
+ * the sub device. If application does not choose the sub device, driver
+ * will assign one as default.
+ *
+ * If the value == VA_ATTRIB_NOT_SUPPORTED, it mean that the attribute
+ * is unsupport or UNKNOWN.
+ */
+
+typedef union _VADisplayAttribValSubDevice{
+    struct{
+        /** \brief current sub device index, read - write */
+        uint32_t current_sub_device     : 4;
+        /** \brief sub devices count, read - only */
+        uint32_t sub_device_count       : 4;
+        /** \brief reserved bits for future, must be zero*/
+        uint32_t reserved               : 8;
+        /** \brief bit mask to indicate which sub_device is available, read only
+         * \code
+         * VADisplayAttribValSubDevice reg;
+         * VADisplayAttribute reg_attr;
+         * reg_attr.type = VADisplayAttribSubDevice;
+         * vaGetDisplayAttributes(dpy, &reg_attr, 1);
+         * reg.value = reg_attr.value;
+         *
+         * for(int i = 0; i < reg.bits.sub_device_count; i ++ ){
+         *    if((1<<i) & reg.bits.sub_device_mask){
+         *        printf("sub device  %d can be selected", i);
+         *    }
+         *}
+         * \endcode
+         */
+        uint32_t sub_device_mask       : 16;
+    }bits;
+    uint32_t value;
+}VADisplayAttribValSubDevice;
 
 /** Currently defined display attribute types */
 typedef enum
@@ -4950,6 +5052,16 @@ typedef enum
      * specify vaPutSurface render area if there is no drawable on the monitor
      */
     VADisplayAttribRenderRect          = 18,
+    /*
+     * HW attribute, read/write, specify the sub device configure
+     */
+    VADisplayAttribSubDevice           = 19,
+    /*
+     * HW attribute. read only. specify whether vaCopy support on current HW
+     * The value of each bit should equal to 1 << VA_EXEC_MODE_XXX to represent
+     * modes of vaCopy
+     */
+    VADisplayAttribCopy                 = 20,
 } VADisplayAttribType;
 
 /* flags for VADisplayAttribute */
