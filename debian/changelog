@@ -1,3 +1,12 @@
+libva (2.13.0-1) unstable; urgency=medium
+
+  * New upstream version 2.13.0
+  * debian/control:
+    - Bump Standards-Version
+    - Provide new driver ABI
+
+ -- Sebastian Ramacher <sramacher@debian.org>  Sun, 19 Sep 2021 20:41:45 +0200
+
 libva (2.12.0-2) unstable; urgency=medium
 
   * Upload to unstable
