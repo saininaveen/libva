@@ -9,7 +9,7 @@ Build-Depends:
  debhelper-compat (= 13),
  libdrm-dev,
  libgl1-mesa-dev | libgl-dev,
- libwayland-dev (>= 1.0.0) [linux-any],
+ libwayland-dev [linux-any],
  libx11-dev,
  libxext-dev,
  libxfixes-dev,
@@ -31,7 +31,7 @@ Depends:
  libva-wayland2 (= ${binary:Version}) [linux-any],
  libva-x11-2 (= ${binary:Version}),
  libva2 (= ${binary:Version}),
- libwayland-dev (>= 1.0.0) [linux-any],
+ libwayland-dev [linux-any],
  ${misc:Depends},
  libset-scalar-perl
 Provides:
