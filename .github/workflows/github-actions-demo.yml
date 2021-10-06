@@ -22,5 +22,6 @@ jobs:
       - name: list build-script directory
         run: |
           ls ${{ github.workspace }}
+          ls ${{ github.workspace }}/build-script
           find ${{ github.workspace }} -name build-script
       - run: echo "🍏 This job's status is ${{ job.status }}."
