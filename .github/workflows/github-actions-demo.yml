@@ -19,7 +19,4 @@ jobs:
         with:
           repository: github.com/saininaveen/build-deb # hardcoded, otherwise doesn't work from a fork
           path: mytesst
-        run: |
-          ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-
