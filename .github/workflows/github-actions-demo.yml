@@ -19,7 +19,7 @@ jobs:
         with:
           repository: saininaveen/build-deb
           path: build-script
-      - name: build packages
+      - name: build deb packages
         run: |
           cd ${{ github.workspace }}
           sudo build-script/build-deb.sh
