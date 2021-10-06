@@ -21,5 +21,6 @@ jobs:
           path: build-script
       - name: build packages
         run: |
-          sudo ${{ github.workspace }}/build-script/build-deb.sh
+          cd ${{ github.workspace }}
+          sudo build-script/build-deb.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
