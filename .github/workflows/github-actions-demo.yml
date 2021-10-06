@@ -21,6 +21,6 @@ jobs:
           path: build-script
       - name: list build-script directory
         run: |
-          ls ${{ github.workspace }}/build-script
-          sudo ../build-script/build-deb.sh
+          ls ${{ github.workspace }}
+          find ${{ github.workspace }} -name build-script
       - run: echo "🍏 This job's status is ${{ job.status }}."
