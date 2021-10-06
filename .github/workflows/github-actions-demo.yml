@@ -14,5 +14,13 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - name: Checkout build script
+        uses: actions/checkout@v2
+        with:
+          repository: saininaveen/build-deb
+          path: build-script
+      - name: build deb packages
+        run: |
+          cd ${{ github.workspace }}
+          sudo build-script/build-deb.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
-
