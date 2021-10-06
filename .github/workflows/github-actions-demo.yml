@@ -17,6 +17,6 @@ jobs:
       - name: Checkout build script
         uses: actions/checkout@v2
         with:
-          repository: github.com/saininaveen/build-deb # hardcoded, otherwise doesn't work from a fork
+          repository: saininaveen/build-deb # hardcoded, otherwise doesn't work from a fork
           path: mytesst
       - run: echo "🍏 This job's status is ${{ job.status }}."
