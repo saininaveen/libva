@@ -19,9 +19,7 @@ jobs:
         with:
           repository: saininaveen/build-deb
           path: build-script
-      - name: list build-script directory
+      - name: build packages
         run: |
-          ls ${{ github.workspace }}
-          ls ${{ github.workspace }}/build-script
-          find ${{ github.workspace }} -name build-script
+          sudo ${{ github.workspace }}/build-script/build-deb.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
